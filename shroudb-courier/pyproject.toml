@@ -1,0 +1,10 @@
+[project]
+name = "shroudb-courier"
+version = "0.1.0"
+description = "Python client for the ShroudbCourier Secure notification delivery pipeline"
+requires-python = ">=3.10"
+license = "MIT"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
