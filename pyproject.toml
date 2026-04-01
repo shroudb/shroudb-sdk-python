@@ -2,7 +2,7 @@
 
 [project]
 name = "shroudb"
-version = "0.1.0"
+version = "1.4.5"
 description = "ShrouDB unified SDK — shroudb, cipher, sigil, veil, sentry, forge, keep, courier, chronicle"
 requires-python = ">=3.10"
 license = "MIT"
