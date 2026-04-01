@@ -89,6 +89,20 @@ class CourierNamespace:
         result = await self._transport.execute(self._engine, args)
         return _types.CourierHealthResponse(channels=result.get("channels", 0), status=result.get("status", ""))
 
+    async def notify_event(self, channel: str, subject: str, body: str) -> _types.CourierNotifyEventResponse:
+        """NOTIFY_EVENT — Trigger a notification on a pre-configured channel (e.g. rotation/expiry alerts)"""
+        args: list[str] = ["NOTIFY_EVENT"]
+        args.append(str(channel))
+        args.append(str(subject))
+        args.append(str(body))
+        result = await self._transport.execute(self._engine, args)
+        return _types.CourierNotifyEventResponse(
+            channel=result.get("channel", ""),
+            delivered_at=result.get("delivered_at", 0),
+            delivery_id=result.get("delivery_id", ""),
+            status=result.get("status", ""),
+        )
+
     async def ping(self) -> dict[str, Any]:
         """PING — Connectivity check"""
         args: list[str] = ["PING"]

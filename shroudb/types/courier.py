@@ -66,3 +66,12 @@ class CourierHealthResponse:
 
     channels: int
     status: str
+
+@dataclass(frozen=True)
+class CourierNotifyEventResponse:
+    """Response from ``courier.NOTIFY_EVENT()``."""
+
+    channel: str
+    delivered_at: int
+    delivery_id: str
+    status: str
