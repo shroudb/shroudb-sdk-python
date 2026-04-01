@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import base64
 import json
 from typing import Any
 
@@ -81,11 +82,11 @@ class KeepNamespace:
         result = await self._transport.execute(self._engine, args)
         return result
 
-    async def put(self, path: str, value: str) -> _types.KeepPutResponse:
+    async def put(self, path: str, value: str | bytes) -> _types.KeepPutResponse:
         """PUT — Store a new version of a secret. Creates the secret if it doesn't exist. Undeletes if soft-deleted."""
         args: list[str] = ["PUT"]
         args.append(str(path))
-        args.append(str(value))
+        args.append(value if isinstance(value, str) else base64.b64encode(value).decode())
         result = await self._transport.execute(self._engine, args)
         return _types.KeepPutResponse(
             status=result.get("status", ""),

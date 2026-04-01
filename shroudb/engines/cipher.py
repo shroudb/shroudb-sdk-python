@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import base64
 import json
 from typing import Any
 
@@ -29,22 +30,22 @@ class CipherNamespace:
         result = await self._transport.execute(self._engine, args)
         return _types.CipherCommandListResponse(count=result.get("count", 0), commands=result.get("commands", None))
 
-    async def decrypt(self, keyring: str, ciphertext: str, context: str | None = None) -> _types.CipherDecryptResponse:
+    async def decrypt(self, keyring: str, ciphertext: str | bytes, context: str | None = None) -> _types.CipherDecryptResponse:
         """DECRYPT — Decrypt ciphertext using the embedded key version"""
         args: list[str] = ["DECRYPT"]
         args.append(str(keyring))
-        args.append(str(ciphertext))
+        args.append(ciphertext if isinstance(ciphertext, str) else base64.b64encode(ciphertext).decode())
         if context is not None:
             args.append("CONTEXT")
             args.append(str(context))
         result = await self._transport.execute(self._engine, args)
         return _types.CipherDecryptResponse(plaintext=result.get("plaintext", ""))
 
-    async def encrypt(self, keyring: str, plaintext: str, context: str | None = None, key_version: int | None = None, convergent: bool = False) -> _types.CipherEncryptResponse:
+    async def encrypt(self, keyring: str, plaintext: str | bytes, context: str | None = None, key_version: int | None = None, convergent: bool = False) -> _types.CipherEncryptResponse:
         """ENCRYPT — Encrypt plaintext with the active key version"""
         args: list[str] = ["ENCRYPT"]
         args.append(str(keyring))
-        args.append(str(plaintext))
+        args.append(plaintext if isinstance(plaintext, str) else base64.b64encode(plaintext).decode())
         if context is not None:
             args.append("CONTEXT")
             args.append(str(context))
@@ -120,11 +121,11 @@ class CipherNamespace:
         result = await self._transport.execute(self._engine, args)
         return _types.CipherPingResponse(message=result.get("message", ""))
 
-    async def rewrap(self, keyring: str, ciphertext: str, context: str | None = None) -> _types.CipherRewrapResponse:
+    async def rewrap(self, keyring: str, ciphertext: str | bytes, context: str | None = None) -> _types.CipherRewrapResponse:
         """REWRAP — Re-encrypt ciphertext with the current active key version"""
         args: list[str] = ["REWRAP"]
         args.append(str(keyring))
-        args.append(str(ciphertext))
+        args.append(ciphertext if isinstance(ciphertext, str) else base64.b64encode(ciphertext).decode())
         if context is not None:
             args.append("CONTEXT")
             args.append(str(context))
@@ -146,19 +147,19 @@ class CipherNamespace:
             previous_version=result.get("previous_version"),
         )
 
-    async def sign(self, keyring: str, data: str) -> _types.CipherSignResponse:
+    async def sign(self, keyring: str, data: str | bytes) -> _types.CipherSignResponse:
         """SIGN — Create a detached signature"""
         args: list[str] = ["SIGN"]
         args.append(str(keyring))
-        args.append(str(data))
+        args.append(data if isinstance(data, str) else base64.b64encode(data).decode())
         result = await self._transport.execute(self._engine, args)
         return _types.CipherSignResponse(signature=result.get("signature", ""), key_version=result.get("key_version", 0))
 
-    async def verify_signature(self, keyring: str, data: str, signature: str) -> _types.CipherVerifySignatureResponse:
+    async def verify_signature(self, keyring: str, data: str | bytes, signature: str) -> _types.CipherVerifySignatureResponse:
         """VERIFY_SIGNATURE — Verify a detached signature"""
         args: list[str] = ["VERIFY_SIGNATURE"]
         args.append(str(keyring))
-        args.append(str(data))
+        args.append(data if isinstance(data, str) else base64.b64encode(data).decode())
         args.append(str(signature))
         result = await self._transport.execute(self._engine, args)
         return _types.CipherVerifySignatureResponse(valid=result.get("valid", False))
