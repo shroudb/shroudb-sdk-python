@@ -46,6 +46,7 @@ db = ShrouDB(
     keep="shroudb-keep://token@localhost:6899",
     courier="shroudb-courier://token@localhost:6999",
     chronicle="chronicle://token@localhost:7099",
+    stash="shroudb-stash://token@localhost:6399",
 )
 ```
 
@@ -282,6 +283,20 @@ Structured audit event engine
 | `ingest_batch(events_json)` | Ingest multiple events in a single call |
 | `ping()` | Keepalive |
 | `query(**kwargs)` | Query events with filter predicates |
+
+### `db.stash`
+
+Encrypted blob storage with S3 backend and envelope encryption
+
+| Method | Description |
+|--------|-------------|
+| `command()` | List supported commands |
+| `health()` | Health check |
+| `inspect(id)` | Read blob metadata without downloading or decrypting |
+| `ping()` | Ping-pong |
+| `retrieve(id)` | Retrieve and decrypt a blob |
+| `revoke(id, **kwargs)` | Revoke a blob (hard crypto-shred by default, SOFT for soft revoke) |
+| `store(id, data_b64, **kwargs)` | Store an encrypted blob |
 
 ## Error Handling
 

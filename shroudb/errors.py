@@ -41,6 +41,12 @@ class ErrorCode:
     CAPABILITY_MISSING: str = "CAPABILITY_MISSING"
     """Required engine capability not available (e.g., Cipher for PII fields)"""
 
+    CIPHER_UNAVAILABLE: str = "CIPHER_UNAVAILABLE"
+    """Cipher engine not available for envelope encryption"""
+
+    CRYPTO: str = "CRYPTO"
+    """Encryption or decryption failed"""
+
     DECRYPT: str = "DECRYPT"
     """Cipher decryption failed"""
 
@@ -70,6 +76,9 @@ class ErrorCode:
 
     INTERNAL: str = "INTERNAL"
     """Unexpected server error"""
+
+    INVALID_ARGUMENT: str = "INVALID_ARGUMENT"
+    """Invalid argument"""
 
     INVALID_FIELD: str = "INVALID_FIELD"
     """Field value is invalid or field cannot be updated via this path"""
@@ -104,6 +113,9 @@ class ErrorCode:
     NOT_READY: str = "NOT_READY"
     """Server is not in READY state"""
 
+    OBJECT_STORE: str = "OBJECT_STORE"
+    """S3 object store operation failed"""
+
     PIPELINE_ABORTED: str = "PIPELINE_ABORTED"
     """Pipeline command failed, all commands rolled back"""
 
@@ -113,6 +125,9 @@ class ErrorCode:
     RETIRED: str = "RETIRED"
     """Key version is retired — use REWRAP"""
 
+    REVOKED: str = "REVOKED"
+    """Blob has been soft-revoked"""
+
     SCHEMA_EXISTS: str = "SCHEMA_EXISTS"
     """Schema already exists"""
 
@@ -121,6 +136,9 @@ class ErrorCode:
 
     SCHEMA_VALIDATION: str = "SCHEMA_VALIDATION"
     """Schema definition is invalid"""
+
+    SHREDDED: str = "SHREDDED"
+    """Blob has been crypto-shredded (unrecoverable)"""
 
     SIGNING: str = "SIGNING"
     """Failed to sign decision"""

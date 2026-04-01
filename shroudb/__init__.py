@@ -13,6 +13,7 @@ from .engines.forge import ForgeNamespace
 from .engines.keep import KeepNamespace
 from .engines.courier import CourierNamespace
 from .engines.chronicle import ChronicleNamespace
+from .engines.stash import StashNamespace
 
 __all__ = [
     "ShrouDB",
@@ -27,4 +28,5 @@ __all__ = [
     "KeepNamespace",
     "CourierNamespace",
     "ChronicleNamespace",
+    "StashNamespace",
 ]

@@ -16,6 +16,7 @@ from .engines.forge import ForgeNamespace
 from .engines.keep import KeepNamespace
 from .engines.courier import CourierNamespace
 from .engines.chronicle import ChronicleNamespace
+from .engines.stash import StashNamespace
 
 
 class _NoTransport(Transport):
@@ -58,6 +59,7 @@ class ShrouDB:
         keep: str | None = None,
         courier: str | None = None,
         chronicle: str | None = None,
+        stash: str | None = None,
     ) -> None:
         self._transports: list[Transport] = []
 
@@ -74,6 +76,7 @@ class ShrouDB:
                     "keep": "/v1/keep",
                     "courier": "/v1/courier",
                     "chronicle": "/v1/chronicle",
+                    "stash": "/v1/stash",
                 }
                 default_transport = HttpTransport(moat, token, prefixes)
             else:
@@ -160,6 +163,15 @@ class ShrouDB:
             self.chronicle = ChronicleNamespace(default_transport, "chronicle")
         else:
             self.chronicle = ChronicleNamespace(_NoTransport("chronicle"), "chronicle")
+
+        if stash is not None:
+            _t_stash = Resp3Transport(stash)
+            self._transports.append(_t_stash)
+            self.stash: StashNamespace = StashNamespace(_t_stash, "stash")
+        elif default_transport is not None:
+            self.stash = StashNamespace(default_transport, "stash")
+        else:
+            self.stash = StashNamespace(_NoTransport("stash"), "stash")
 
     async def close(self) -> None:
         """Close all connections and release resources."""
