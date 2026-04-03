@@ -78,7 +78,7 @@ class VeilNamespace:
         result = await self._transport.execute(self._engine, args)
         return _types.VeilPingResponse(type=result.get("type", ""), value=result.get("value", None))
 
-    async def put(self, index: str, id_: str, data_b64: str, field: str | None = None, blind: str | None = None) -> _types.VeilPutResponse:
+    async def put(self, index: str, id_: str, data_b64: str, field: str | None = None, blind: bool = False) -> _types.VeilPutResponse:
         """PUT — Store blind tokens for an entry. In standard mode, data_b64 is base64-encoded plaintext (server tokenizes). With BLIND flag, data_b64 is base64-encoded BlindTokenSet JSON (client pre-tokenized, for E2EE)."""
         args: list[str] = ["PUT"]
         args.append(str(index))
@@ -87,9 +87,8 @@ class VeilNamespace:
         if field is not None:
             args.append("FIELD")
             args.append(str(field))
-        if blind is not None:
+        if blind:
             args.append("BLIND")
-            args.append(str(blind))
         result = await self._transport.execute(self._engine, args)
         return _types.VeilPutResponse(
             status=result.get("status", None),
@@ -97,7 +96,7 @@ class VeilNamespace:
             version=result.get("version", None),
         )
 
-    async def search(self, index: str, query: str, mode: str | None = None, field: str | None = None, limit: int | None = None, blind: str | None = None) -> _types.VeilSearchResponse:
+    async def search(self, index: str, query: str, mode: str | None = None, field: str | None = None, limit: int | None = None, blind: bool = False) -> _types.VeilSearchResponse:
         """SEARCH — Search a blind index. In standard mode, query is plain text (server tokenizes). With BLIND flag, query is base64-encoded BlindTokenSet JSON (client pre-tokenized, for E2EE)."""
         args: list[str] = ["SEARCH"]
         args.append(str(index))
@@ -111,9 +110,8 @@ class VeilNamespace:
         if limit is not None:
             args.append("LIMIT")
             args.append(str(limit))
-        if blind is not None:
+        if blind:
             args.append("BLIND")
-            args.append(str(blind))
         result = await self._transport.execute(self._engine, args)
         return _types.VeilSearchResponse(
             status=result.get("status", None),

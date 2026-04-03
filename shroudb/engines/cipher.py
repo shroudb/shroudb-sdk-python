@@ -30,11 +30,11 @@ class CipherNamespace:
         result = await self._transport.execute(self._engine, args)
         return _types.CipherCommandListResponse(count=result.get("count", 0), commands=result.get("commands", None))
 
-    async def decrypt(self, keyring: str, ciphertext: str | bytes, context: str | None = None) -> _types.CipherDecryptResponse:
+    async def decrypt(self, keyring: str, ciphertext: str, context: str | None = None) -> _types.CipherDecryptResponse:
         """DECRYPT — Decrypt ciphertext using the embedded key version"""
         args: list[str] = ["DECRYPT"]
         args.append(str(keyring))
-        args.append(ciphertext if isinstance(ciphertext, str) else base64.b64encode(ciphertext).decode())
+        args.append(str(ciphertext))
         if context is not None:
             args.append("CONTEXT")
             args.append(str(context))
@@ -121,11 +121,11 @@ class CipherNamespace:
         result = await self._transport.execute(self._engine, args)
         return _types.CipherPingResponse(message=result.get("message", ""))
 
-    async def rewrap(self, keyring: str, ciphertext: str | bytes, context: str | None = None) -> _types.CipherRewrapResponse:
+    async def rewrap(self, keyring: str, ciphertext: str, context: str | None = None) -> _types.CipherRewrapResponse:
         """REWRAP — Re-encrypt ciphertext with the current active key version"""
         args: list[str] = ["REWRAP"]
         args.append(str(keyring))
-        args.append(ciphertext if isinstance(ciphertext, str) else base64.b64encode(ciphertext).decode())
+        args.append(str(ciphertext))
         if context is not None:
             args.append("CONTEXT")
             args.append(str(context))

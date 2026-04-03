@@ -71,15 +71,13 @@ class SentryNamespace:
             total_versions=result.get("total_versions", 0),
         )
 
-    async def key_rotate(self, force: str | None = None, dryrun: str | None = None) -> _types.SentryKeyRotateResponse:
+    async def key_rotate(self, force: bool = False, dryrun: bool = False) -> _types.SentryKeyRotateResponse:
         """KEY ROTATE — Rotate the signing key"""
         args: list[str] = ["KEY", "ROTATE"]
-        if force is not None:
+        if force:
             args.append("FORCE")
-            args.append(str(force))
-        if dryrun is not None:
+        if dryrun:
             args.append("DRYRUN")
-            args.append(str(dryrun))
         result = await self._transport.execute(self._engine, args)
         return _types.SentryKeyRotateResponse(
             key_version=result.get("key_version", 0),

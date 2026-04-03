@@ -62,16 +62,14 @@ class ForgeNamespace:
         result = await self._transport.execute(self._engine, args)
         return _types.ForgeCaListResponse(cas=result.get("cas", None))
 
-    async def ca_rotate(self, name: str, force: str | None = None, dryrun: str | None = None) -> _types.ForgeCaRotateResponse:
+    async def ca_rotate(self, name: str, force: bool = False, dryrun: bool = False) -> _types.ForgeCaRotateResponse:
         """CA ROTATE — Rotate CA signing key"""
         args: list[str] = ["CA", "ROTATE"]
         args.append(str(name))
-        if force is not None:
+        if force:
             args.append("FORCE")
-            args.append(str(force))
-        if dryrun is not None:
+        if dryrun:
             args.append("DRYRUN")
-            args.append(str(dryrun))
         result = await self._transport.execute(self._engine, args)
         return _types.ForgeCaRotateResponse(
             key_version=result.get("key_version", 0),

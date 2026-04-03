@@ -53,7 +53,7 @@ class ShroudbNamespace:
         result = await self._transport.execute(self._engine, args)
         return _types.ShroudbDeleteResponse(version=result.get("version", 0))
 
-    async def get(self, namespace: str, key: str, meta: str | None = None, version: int | None = None) -> _types.ShroudbGetResponse:
+    async def get(self, namespace: str, key: str, meta: bool | None = None, version: int | None = None) -> _types.ShroudbGetResponse:
         """GET — Retrieve the value at a key"""
         args: list[str] = ["GET"]
         args.append(str(namespace))
@@ -125,7 +125,7 @@ class ShroudbNamespace:
         result = await self._transport.execute(self._engine, args)
         return result
 
-    async def namespace_drop(self, name: str, force: str | None = None) -> dict[str, Any]:
+    async def namespace_drop(self, name: str, force: bool | None = None) -> dict[str, Any]:
         """NAMESPACE DROP — Drop a namespace"""
         args: list[str] = ["NAMESPACE", "DROP"]
         args.append(str(name))
