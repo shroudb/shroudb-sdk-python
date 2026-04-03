@@ -154,8 +154,8 @@ print(result.status)
 | `index_info` | `name` | `{ index, created_at, entry_count }` | Get information about a blind index |
 | `index_list` | `` | `{ items, type }` | List all blind index names |
 | `ping` | `` | `{ type, value }` | Ping-pong |
-| `put` | `index, id, plaintext_b64, **kwargs` | `{ status, id, version }` | Tokenize plaintext and store the blind tokens under the given entry ID |
-| `search` | `index, query, **kwargs` | `{ status, scanned, matched, results }` | Search a blind index. Tokenizes the query, generates blind tokens, and compares against stored entries. |
+| `put` | `index, id, data_b64, **kwargs` | `{ status, id, version }` | Store blind tokens for an entry. In standard mode, data_b64 is base64-encoded plaintext (server tokenizes). With BLIND flag, data_b64 is base64-encoded BlindTokenSet JSON (client pre-tokenized, for E2EE). |
+| `search` | `index, query, **kwargs` | `{ status, scanned, matched, results }` | Search a blind index. In standard mode, query is plain text (server tokenizes). With BLIND flag, query is base64-encoded BlindTokenSet JSON (client pre-tokenized, for E2EE). |
 | `tokenize` | `index, plaintext_b64, **kwargs` | `{ status, words, trigrams, tokens }` | Generate blind tokens from plaintext without storing. Returns HMAC-derived tokens for external use. |
 
 ### Examples
