@@ -28,16 +28,16 @@ class SigilNamespace:
         result = await self._transport.execute(self._engine, args)
         return _types.SigilCredentialChangeResponse(status=result.get("status", ""))
 
-    async def credential_import(self, schema: str, id_: str, field: str, hash_: str, metadata: dict[str, Any] | None = None) -> _types.SigilCredentialImportResponse:
+    async def credential_import(self, schema: str, id_: str, field: str, hash_: str, meta: dict[str, Any] | None = None) -> _types.SigilCredentialImportResponse:
         """CREDENTIAL IMPORT — Import a pre-hashed credential (bcrypt, scrypt, argon2). Transparently rehashed to Argon2id on next verify."""
         args: list[str] = ["CREDENTIAL", "IMPORT"]
         args.append(str(schema))
         args.append(str(id_))
         args.append(str(field))
         args.append(str(hash_))
-        if metadata is not None:
-            args.append("METADATA")
-            args.append(metadata if isinstance(metadata, str) else json.dumps(metadata))
+        if meta is not None:
+            args.append("META")
+            args.append(meta if isinstance(meta, str) else json.dumps(meta))
         result = await self._transport.execute(self._engine, args)
         return _types.SigilCredentialImportResponse(algorithm=result.get("algorithm", ""))
 
@@ -158,15 +158,15 @@ class SigilNamespace:
         result = await self._transport.execute(self._engine, args)
         return _types.SigilPasswordChangeResponse(status=result.get("status", ""))
 
-    async def password_import(self, schema: str, id_: str, hash_: str, metadata: dict[str, Any] | None = None) -> _types.SigilPasswordImportResponse:
+    async def password_import(self, schema: str, id_: str, hash_: str, meta: dict[str, Any] | None = None) -> _types.SigilPasswordImportResponse:
         """PASSWORD IMPORT — Sugar: import pre-hashed password. Infers credential field from schema. Equivalent to CREDENTIAL IMPORT with implicit field."""
         args: list[str] = ["PASSWORD", "IMPORT"]
         args.append(str(schema))
         args.append(str(id_))
         args.append(str(hash_))
-        if metadata is not None:
-            args.append("METADATA")
-            args.append(metadata if isinstance(metadata, str) else json.dumps(metadata))
+        if meta is not None:
+            args.append("META")
+            args.append(meta if isinstance(meta, str) else json.dumps(meta))
         result = await self._transport.execute(self._engine, args)
         return _types.SigilPasswordImportResponse(algorithm=result.get("algorithm", ""))
 
@@ -200,15 +200,15 @@ class SigilNamespace:
         result = await self._transport.execute(self._engine, args)
         return _types.SigilSchemaRegisterResponse(version=result.get("version", 0))
 
-    async def session_create(self, schema: str, id_: str, password: str, metadata: dict[str, Any] | None = None) -> _types.SigilSessionCreateResponse:
+    async def session_create(self, schema: str, id_: str, password: str, meta: dict[str, Any] | None = None) -> _types.SigilSessionCreateResponse:
         """SESSION CREATE — Verify credentials and issue access + refresh tokens"""
         args: list[str] = ["SESSION", "CREATE"]
         args.append(str(schema))
         args.append(str(id_))
         args.append(str(password))
-        if metadata is not None:
-            args.append("METADATA")
-            args.append(metadata if isinstance(metadata, str) else json.dumps(metadata))
+        if meta is not None:
+            args.append("META")
+            args.append(meta if isinstance(meta, str) else json.dumps(meta))
         result = await self._transport.execute(self._engine, args)
         return _types.SigilSessionCreateResponse(
             access_token=result.get("access_token", ""),
