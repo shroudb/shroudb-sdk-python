@@ -7,7 +7,13 @@ dual transport support (RESP3 for direct connections, HTTP for Moat gateway).
 ## Installation
 
 ```bash
-pip install shroudb
+pip install git+https://github.com/shroudb/shroudb-sdk-python.git
+```
+
+To pin a specific version:
+
+```bash
+pip install git+https://github.com/shroudb/shroudb-sdk-python.git@v1.0.0
 ```
 
 ## Quick Start
