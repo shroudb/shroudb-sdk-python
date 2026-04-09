@@ -53,6 +53,18 @@ class VeilNamespace:
             status=result.get("status", None),
             index=result.get("index", None),
             created_at=result.get("created_at", None),
+            tokenizer_version=result.get("tokenizer_version", None),
+        )
+
+    async def index_destroy(self, name: str) -> _types.VeilIndexDestroyResponse:
+        """INDEX DESTROY — Crypto-shred an index: zeroize the HMAC key, delete all entries, and remove the index. After destruction, the index name can be reused."""
+        args: list[str] = ["INDEX", "DESTROY"]
+        args.append(str(name))
+        result = await self._transport.execute(self._engine, args)
+        return _types.VeilIndexDestroyResponse(
+            status=result.get("status", None),
+            index=result.get("index", None),
+            deleted_entries=result.get("deleted_entries", None),
         )
 
     async def index_info(self, name: str) -> _types.VeilIndexInfoResponse:
@@ -64,6 +76,7 @@ class VeilNamespace:
             index=result.get("index", None),
             created_at=result.get("created_at", None),
             entry_count=result.get("entry_count", None),
+            tokenizer_version=result.get("tokenizer_version", None),
         )
 
     async def index_list(self) -> _types.VeilIndexListResponse:
@@ -71,6 +84,42 @@ class VeilNamespace:
         args: list[str] = ["INDEX", "LIST"]
         result = await self._transport.execute(self._engine, args)
         return _types.VeilIndexListResponse(items=result.get("items", ""), type=result.get("type", None))
+
+    async def index_reconcile(self, name: str, valid_ids: str) -> _types.VeilIndexReconcileResponse:
+        """INDEX RECONCILE — Remove orphaned entries from the index. Compares stored entry IDs against the provided valid set and deletes any entries not in the set."""
+        args: list[str] = ["INDEX", "RECONCILE"]
+        args.append(str(name))
+        args.append(str(valid_ids))
+        result = await self._transport.execute(self._engine, args)
+        return _types.VeilIndexReconcileResponse(
+            status=result.get("status", None),
+            index=result.get("index", None),
+            orphans_removed=result.get("orphans_removed", None),
+        )
+
+    async def index_reindex(self, name: str) -> _types.VeilIndexReindexResponse:
+        """INDEX REINDEX — Clear all entries and update the tokenizer version to current. The HMAC key is preserved. After reindex, the application must re-submit all entries via PUT. Use this when the tokenizer algorithm has been upgraded."""
+        args: list[str] = ["INDEX", "REINDEX"]
+        args.append(str(name))
+        result = await self._transport.execute(self._engine, args)
+        return _types.VeilIndexReindexResponse(
+            status=result.get("status", None),
+            index=result.get("index", None),
+            tokenizer_version=result.get("tokenizer_version", None),
+            entries_cleared=result.get("entries_cleared", None),
+        )
+
+    async def index_rotate(self, name: str) -> _types.VeilIndexRotateResponse:
+        """INDEX ROTATE — Rotate an index's HMAC key. Generates a new key, deletes all existing entries. The application must re-index all entries after rotation."""
+        args: list[str] = ["INDEX", "ROTATE"]
+        args.append(str(name))
+        result = await self._transport.execute(self._engine, args)
+        return _types.VeilIndexRotateResponse(
+            status=result.get("status", None),
+            index=result.get("index", None),
+            rotated_at=result.get("rotated_at", None),
+            entry_count=result.get("entry_count", None),
+        )
 
     async def ping(self) -> _types.VeilPingResponse:
         """PING — Ping-pong"""

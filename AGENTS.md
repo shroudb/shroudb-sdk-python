@@ -150,9 +150,13 @@ print(result.status)
 | `command_list` | `` | `{ count, commands }` | List all supported commands |
 | `delete` | `index, id` | `{ status, id }` | Remove an entry's blind tokens from the index |
 | `health` | `` | `{ status }` | Health check |
-| `index_create` | `name` | `{ status, index, created_at }` | Create a new blind index with a fresh HMAC key |
-| `index_info` | `name` | `{ index, created_at, entry_count }` | Get information about a blind index |
+| `index_create` | `name` | `{ status, index, created_at, tokenizer_version }` | Create a new blind index with a fresh HMAC key |
+| `index_destroy` | `name` | `{ status, index, deleted_entries }` | Crypto-shred an index: zeroize the HMAC key, delete all entries, and remove the index. After destruction, the index name can be reused. |
+| `index_info` | `name` | `{ index, created_at, entry_count, tokenizer_version }` | Get information about a blind index |
 | `index_list` | `` | `{ items, type }` | List all blind index names |
+| `index_reconcile` | `name, valid_ids` | `{ status, index, orphans_removed }` | Remove orphaned entries from the index. Compares stored entry IDs against the provided valid set and deletes any entries not in the set. |
+| `index_reindex` | `name` | `{ status, index, tokenizer_version, entries_cleared }` | Clear all entries and update the tokenizer version to current. The HMAC key is preserved. After reindex, the application must re-submit all entries via PUT. Use this when the tokenizer algorithm has been upgraded. |
+| `index_rotate` | `name` | `{ status, index, rotated_at, entry_count }` | Rotate an index's HMAC key. Generates a new key, deletes all existing entries. The application must re-index all entries after rotation. |
 | `ping` | `` | `{ type, value }` | Ping-pong |
 | `put` | `index, id, data_b64, **kwargs` | `{ status, id, version }` | Store blind tokens for an entry. In standard mode, data_b64 is base64-encoded plaintext (server tokenizes). With BLIND flag, data_b64 is base64-encoded BlindTokenSet JSON (client pre-tokenized, for E2EE). |
 | `search` | `index, query, **kwargs` | `{ status, scanned, matched, results }` | Search a blind index. In standard mode, query is plain text (server tokenizes). With BLIND flag, query is base64-encoded BlindTokenSet JSON (client pre-tokenized, for E2EE). |
@@ -165,8 +169,8 @@ result = await db.veil.delete("index", "alice")
 print(result.status)
 result = await db.veil.index_create("my-keyring")
 print(result.status)
-result = await db.veil.index_info("my-keyring")
-print(result.index)
+result = await db.veil.index_destroy("my-keyring")
+print(result.status)
 ```
 
 ## `db.sentry` — sentry

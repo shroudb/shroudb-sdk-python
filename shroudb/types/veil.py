@@ -39,6 +39,15 @@ class VeilIndexCreateResponse:
     status: str
     index: str
     created_at: str
+    tokenizer_version: str
+
+@dataclass(frozen=True)
+class VeilIndexDestroyResponse:
+    """Response from ``veil.INDEX_DESTROY()``."""
+
+    status: str
+    index: str
+    deleted_entries: str
 
 @dataclass(frozen=True)
 class VeilIndexInfoResponse:
@@ -47,6 +56,7 @@ class VeilIndexInfoResponse:
     index: str
     created_at: str
     entry_count: str
+    tokenizer_version: str
 
 @dataclass(frozen=True)
 class VeilIndexListResponse:
@@ -54,6 +64,32 @@ class VeilIndexListResponse:
 
     items: str
     type: list[Any]
+
+@dataclass(frozen=True)
+class VeilIndexReconcileResponse:
+    """Response from ``veil.INDEX_RECONCILE()``."""
+
+    status: str
+    index: str
+    orphans_removed: str
+
+@dataclass(frozen=True)
+class VeilIndexReindexResponse:
+    """Response from ``veil.INDEX_REINDEX()``."""
+
+    status: str
+    index: str
+    tokenizer_version: str
+    entries_cleared: str
+
+@dataclass(frozen=True)
+class VeilIndexRotateResponse:
+    """Response from ``veil.INDEX_ROTATE()``."""
+
+    status: str
+    index: str
+    rotated_at: str
+    entry_count: str
 
 @dataclass(frozen=True)
 class VeilPingResponse:
