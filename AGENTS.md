@@ -38,12 +38,12 @@ await db.close()
 |--------|------|---------|-------------|
 | `auth` | `token` | `{ actor }` | Authenticate the connection with a token |
 | `command_list` | `` | `{ commands, count }` | List all supported commands |
-| `config_get` | `key` | `{ key, value }` | Read a runtime configuration value |
-| `config_set` | `key, value` | `{}` | Set a runtime configuration value (admin only) |
+| `config_get` | `key` | `{ key, source, value }` | Read a runtime configuration value |
+| `config_set` | `key, value` | `{}` | Set a runtime configuration value (admin only). Only registered config keys are accepted; unknown keys return an error. Values are type-checked against the key's schema (u64, bool, string). Valid keys: max_segment_bytes, max_segment_entries, snapshot_entry_threshold, snapshot_time_threshold_secs. |
 | `delete` | `namespace, key` | `{ version }` | Delete a key by writing a tombstone |
 | `get` | `namespace, key, meta=None, **kwargs` | `{ key, metadata, value, version }` | Retrieve the value at a key |
 | `health` | `` | `{ message }` | Check server health |
-| `list` | `namespace, **kwargs` | `{ cursor, keys }` | List active keys in a namespace |
+| `list` | `namespace, **kwargs` | `{ cursor, keys }` | List active keys in a namespace. Returns an error if the CURSOR value does not correspond to a key that exists in the namespace. |
 | `namespace_alter` | `name, **kwargs` | `{}` | Update namespace configuration (enforce-on-write-only) |
 | `namespace_create` | `name, **kwargs` | `{}` | Create a new namespace |
 | `namespace_drop` | `name, force=None` | `{}` | Drop a namespace |
@@ -181,11 +181,12 @@ print(result.index)
 | `key_info` | `` | `{ active_kid, active_version, algorithm, decision_ttl_secs, drain_days, jwks_keys, rotation_days, status, total_versions }` | Get signing key metadata |
 | `key_rotate` | `**kwargs` | `{ key_version, previous_version, rotated, status }` | Rotate the signing key |
 | `ping` | `` | `{}` | Connectivity check |
-| `policy_create` | `name, json` | `{ effect, name, priority, status }` | Create a new authorization policy |
+| `policy_create` | `name, json` | `{ effect, name, priority, status, version }` | Create a new authorization policy |
 | `policy_delete` | `name` | `{ status }` | Delete a policy |
-| `policy_get` | `name` | `{ created_at, description, effect, name, priority, status, updated_at }` | Get a policy by name |
+| `policy_get` | `name` | `{ action, conditions, created_at, description, effect, name, principal, priority, resource, status, updated_at, version }` | Get a policy by name |
+| `policy_history` | `name` | `{ count, name, status, versions }` | Get version history of a policy (all past versions plus current) |
 | `policy_list` | `` | `{ count, policies, status }` | List all policy names |
-| `policy_update` | `name, json` | `{ effect, name, priority, status, updated_at }` | Update an existing policy |
+| `policy_update` | `name, json` | `{ effect, name, priority, status, updated_at, version }` | Update an existing policy |
 
 ### Examples
 
@@ -207,6 +208,8 @@ print(result.status)
 | `ca_info` | `name` | `{ algorithm, key_versions, name, subject }` | Get CA metadata and key version status |
 | `ca_list` | `` | `{ cas }` | List all Certificate Authorities |
 | `ca_rotate` | `name, **kwargs` | `{ key_version, previous_version, rotated }` | Rotate CA signing key |
+| `config_get` | `key` | `{ key, status, value }` | Get a runtime configuration value |
+| `config_set` | `key, value` | `{ key, status, value }` | Set a runtime configuration value (only scheduler_interval_secs is mutable) |
 | `inspect` | `ca, serial` | `{ certificate_pem, serial, state, subject }` | Get certificate details |
 | `issue` | `ca, subject, profile, **kwargs` | `{ certificate_pem, private_key_pem, serial }` | Issue a new certificate. Returns cert + private key (private key never stored). |
 | `issue_from_csr` | `ca, csr_pem, profile, **kwargs` | `{ certificate_pem, serial }` | Issue a certificate from a PEM-encoded CSR |
@@ -262,7 +265,10 @@ print(result.status)
 | `channel_list` | `` | `{ channels, count, status }` | List all channels |
 | `command_list` | `` | `{ commands, count }` | List available commands |
 | `deliver` | `json` | `{ channel, delivered_at, delivery_id, status }` | Decrypt recipient and deliver a message |
+| `delivery_get` | `id` | `{ channel, delivered_at, delivery_id, error, status }` | Get a delivery receipt by ID |
+| `delivery_list` | `**kwargs` | `{ count, receipts, status }` | List delivery receipts, optionally filtered by channel |
 | `health` | `` | `{ channels, status }` | Server health check |
+| `metrics` | `` | `{ delivered, failed, per_channel, total_deliveries }` | Get delivery metrics (total, success, failure counts, per-channel breakdown) |
 | `notify_event` | `channel, subject, body` | `{ channel, delivered_at, delivery_id, status }` | Trigger a notification on a pre-configured channel (e.g. rotation/expiry alerts) |
 | `ping` | `` | `{}` | Connectivity check |
 
@@ -291,6 +297,7 @@ print(result.channel_type)
 | `ingest_batch` | `events_json` | `{ ingested, status }` | Ingest multiple events in a single call |
 | `ping` | `` | `{}` | Keepalive |
 | `query` | `**kwargs` | `{ events }` | Query events with filter predicates |
+| `verify` | `` | `{ status, total, verified }` | Verify the cryptographic hash chain integrity of all events. Returns the number of verified events or an error if tampering is detected. |
 
 ### Examples
 

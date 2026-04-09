@@ -94,3 +94,13 @@ class ChronicleNamespace:
             args.append(str(filter_args))
         result = await self._transport.execute(self._engine, args)
         return _types.ChronicleQueryResponse(events=result.get("events", None))
+
+    async def verify(self) -> _types.ChronicleVerifyResponse:
+        """VERIFY — Verify the cryptographic hash chain integrity of all events. Returns the number of verified events or an error if tampering is detected."""
+        args: list[str] = ["VERIFY"]
+        result = await self._transport.execute(self._engine, args)
+        return _types.ChronicleVerifyResponse(
+            status=result.get("status", ""),
+            total=result.get("total", 0),
+            verified=result.get("verified", 0),
+        )

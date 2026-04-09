@@ -103,6 +103,7 @@ class SentryNamespace:
             name=result.get("name", ""),
             priority=result.get("priority", 0),
             status=result.get("status", ""),
+            version=result.get("version", 0),
         )
 
     async def policy_delete(self, name: str) -> _types.SentryPolicyDeleteResponse:
@@ -118,13 +119,30 @@ class SentryNamespace:
         args.append(str(name))
         result = await self._transport.execute(self._engine, args)
         return _types.SentryPolicyGetResponse(
+            action=result.get("action", None),
+            conditions=result.get("conditions", None),
             created_at=result.get("created_at", 0),
             description=result.get("description", ""),
             effect=result.get("effect", ""),
             name=result.get("name", ""),
+            principal=result.get("principal", None),
             priority=result.get("priority", 0),
+            resource=result.get("resource", None),
             status=result.get("status", ""),
             updated_at=result.get("updated_at", 0),
+            version=result.get("version", 0),
+        )
+
+    async def policy_history(self, name: str) -> _types.SentryPolicyHistoryResponse:
+        """POLICY HISTORY — Get version history of a policy (all past versions plus current)"""
+        args: list[str] = ["POLICY", "HISTORY"]
+        args.append(str(name))
+        result = await self._transport.execute(self._engine, args)
+        return _types.SentryPolicyHistoryResponse(
+            count=result.get("count", 0),
+            name=result.get("name", ""),
+            status=result.get("status", ""),
+            versions=result.get("versions", None),
         )
 
     async def policy_list(self) -> _types.SentryPolicyListResponse:
@@ -149,4 +167,5 @@ class SentryNamespace:
             priority=result.get("priority", 0),
             status=result.get("status", ""),
             updated_at=result.get("updated_at", 0),
+            version=result.get("version", 0),
         )

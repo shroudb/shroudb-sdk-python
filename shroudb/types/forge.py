@@ -45,6 +45,22 @@ class ForgeCaRotateResponse:
     rotated: bool
 
 @dataclass(frozen=True)
+class ForgeConfigGetResponse:
+    """Response from ``forge.CONFIG_GET()``."""
+
+    key: str
+    status: str
+    value: str
+
+@dataclass(frozen=True)
+class ForgeConfigSetResponse:
+    """Response from ``forge.CONFIG_SET()``."""
+
+    key: str
+    status: str
+    value: str
+
+@dataclass(frozen=True)
 class ForgeInspectResponse:
     """Response from ``forge.INSPECT()``."""
 

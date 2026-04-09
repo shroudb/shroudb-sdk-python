@@ -35,10 +35,14 @@ class ShroudbNamespace:
         args: list[str] = ["CONFIG", "GET"]
         args.append(str(key))
         result = await self._transport.execute(self._engine, args)
-        return _types.ShroudbConfigGetResponse(key=result.get("key", ""), value=result.get("value", None))
+        return _types.ShroudbConfigGetResponse(
+            key=result.get("key", ""),
+            source=result.get("source", None),
+            value=result.get("value", None),
+        )
 
     async def config_set(self, key: str, value: str) -> dict[str, Any]:
-        """CONFIG SET — Set a runtime configuration value (admin only)"""
+        """CONFIG SET — Set a runtime configuration value (admin only). Only registered config keys are accepted; unknown keys return an error. Values are type-checked against the key's schema (u64, bool, string). Valid keys: max_segment_bytes, max_segment_entries, snapshot_entry_threshold, snapshot_time_threshold_secs."""
         args: list[str] = ["CONFIG", "SET"]
         args.append(str(key))
         args.append(str(value))
@@ -78,7 +82,7 @@ class ShroudbNamespace:
         return _types.ShroudbHealthResponse(message=result.get("message", ""))
 
     async def list(self, namespace: str, prefix: str | None = None, cursor: str | None = None, limit: int | None = None) -> _types.ShroudbListResponse:
-        """LIST — List active keys in a namespace"""
+        """LIST — List active keys in a namespace. Returns an error if the CURSOR value does not correspond to a key that exists in the namespace."""
         args: list[str] = ["LIST"]
         args.append(str(namespace))
         if prefix is not None:

@@ -73,6 +73,7 @@ class SentryPolicyCreateResponse:
     name: str
     priority: int
     status: str
+    version: int
 
 @dataclass(frozen=True)
 class SentryPolicyDeleteResponse:
@@ -84,13 +85,27 @@ class SentryPolicyDeleteResponse:
 class SentryPolicyGetResponse:
     """Response from ``sentry.POLICY_GET()``."""
 
+    action: str
+    conditions: str
     created_at: int
     description: str
     effect: str
     name: str
+    principal: str
     priority: int
+    resource: str
     status: str
     updated_at: int
+    version: int
+
+@dataclass(frozen=True)
+class SentryPolicyHistoryResponse:
+    """Response from ``sentry.POLICY_HISTORY()``."""
+
+    count: int
+    name: str
+    status: str
+    versions: list[Any]
 
 @dataclass(frozen=True)
 class SentryPolicyListResponse:
@@ -109,3 +124,4 @@ class SentryPolicyUpdateResponse:
     priority: int
     status: str
     updated_at: int
+    version: int

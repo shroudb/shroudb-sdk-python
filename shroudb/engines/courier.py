@@ -84,11 +84,51 @@ class CourierNamespace:
             status=result.get("status", ""),
         )
 
+    async def delivery_get(self, id_: str) -> _types.CourierDeliveryGetResponse:
+        """DELIVERY GET — Get a delivery receipt by ID"""
+        args: list[str] = ["DELIVERY", "GET"]
+        args.append(str(id_))
+        result = await self._transport.execute(self._engine, args)
+        return _types.CourierDeliveryGetResponse(
+            channel=result.get("channel", ""),
+            delivered_at=result.get("delivered_at", 0),
+            delivery_id=result.get("delivery_id", ""),
+            error=result.get("error", ""),
+            status=result.get("status", ""),
+        )
+
+    async def delivery_list(self, channel: str | None = None, limit: int | None = None) -> _types.CourierDeliveryListResponse:
+        """DELIVERY LIST — List delivery receipts, optionally filtered by channel"""
+        args: list[str] = ["DELIVERY", "LIST"]
+        if channel is not None:
+            args.append("CHANNEL")
+            args.append(str(channel))
+        if limit is not None:
+            args.append("LIMIT")
+            args.append(str(limit))
+        result = await self._transport.execute(self._engine, args)
+        return _types.CourierDeliveryListResponse(
+            count=result.get("count", 0),
+            receipts=result.get("receipts", None),
+            status=result.get("status", ""),
+        )
+
     async def health(self) -> _types.CourierHealthResponse:
         """HEALTH — Server health check"""
         args: list[str] = ["HEALTH"]
         result = await self._transport.execute(self._engine, args)
         return _types.CourierHealthResponse(channels=result.get("channels", 0), status=result.get("status", ""))
+
+    async def metrics(self) -> _types.CourierMetricsResponse:
+        """METRICS — Get delivery metrics (total, success, failure counts, per-channel breakdown)"""
+        args: list[str] = ["METRICS"]
+        result = await self._transport.execute(self._engine, args)
+        return _types.CourierMetricsResponse(
+            delivered=result.get("delivered", 0),
+            failed=result.get("failed", 0),
+            per_channel=result.get("per_channel", None),
+            total_deliveries=result.get("total_deliveries", 0),
+        )
 
     async def notify_event(self, channel: str, subject: str, body: str) -> _types.CourierNotifyEventResponse:
         """NOTIFY_EVENT — Trigger a notification on a pre-configured channel (e.g. rotation/expiry alerts)"""

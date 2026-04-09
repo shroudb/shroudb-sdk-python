@@ -24,6 +24,7 @@ class ShroudbConfigGetResponse:
     """Response from ``shroudb.CONFIG GET()``."""
 
     key: str
+    source: str
     value: str
 
 @dataclass(frozen=True)

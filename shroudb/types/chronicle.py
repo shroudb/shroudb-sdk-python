@@ -60,3 +60,11 @@ class ChronicleQueryResponse:
     """Response from ``chronicle.QUERY()``."""
 
     events: list[Any]
+
+@dataclass(frozen=True)
+class ChronicleVerifyResponse:
+    """Response from ``chronicle.VERIFY()``."""
+
+    status: str
+    total: int
+    verified: int

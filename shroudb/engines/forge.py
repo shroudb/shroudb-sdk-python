@@ -77,6 +77,29 @@ class ForgeNamespace:
             rotated=result.get("rotated", False),
         )
 
+    async def config_get(self, key: str) -> _types.ForgeConfigGetResponse:
+        """CONFIG GET — Get a runtime configuration value"""
+        args: list[str] = ["CONFIG", "GET"]
+        args.append(str(key))
+        result = await self._transport.execute(self._engine, args)
+        return _types.ForgeConfigGetResponse(
+            key=result.get("key", ""),
+            status=result.get("status", ""),
+            value=result.get("value", None),
+        )
+
+    async def config_set(self, key: str, value: str) -> _types.ForgeConfigSetResponse:
+        """CONFIG SET — Set a runtime configuration value (only scheduler_interval_secs is mutable)"""
+        args: list[str] = ["CONFIG", "SET"]
+        args.append(str(key))
+        args.append(str(value))
+        result = await self._transport.execute(self._engine, args)
+        return _types.ForgeConfigSetResponse(
+            key=result.get("key", ""),
+            status=result.get("status", ""),
+            value=result.get("value", ""),
+        )
+
     async def inspect(self, ca: str, serial: str) -> _types.ForgeInspectResponse:
         """INSPECT — Get certificate details"""
         args: list[str] = ["INSPECT"]

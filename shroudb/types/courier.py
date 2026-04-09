@@ -61,11 +61,38 @@ class CourierDeliverResponse:
     status: str
 
 @dataclass(frozen=True)
+class CourierDeliveryGetResponse:
+    """Response from ``courier.DELIVERY_GET()``."""
+
+    channel: str
+    delivered_at: int
+    delivery_id: str
+    error: str
+    status: str
+
+@dataclass(frozen=True)
+class CourierDeliveryListResponse:
+    """Response from ``courier.DELIVERY_LIST()``."""
+
+    count: int
+    receipts: list[Any]
+    status: str
+
+@dataclass(frozen=True)
 class CourierHealthResponse:
     """Response from ``courier.HEALTH()``."""
 
     channels: int
     status: str
+
+@dataclass(frozen=True)
+class CourierMetricsResponse:
+    """Response from ``courier.METRICS()``."""
+
+    delivered: int
+    failed: int
+    per_channel: str
+    total_deliveries: int
 
 @dataclass(frozen=True)
 class CourierNotifyEventResponse:
