@@ -243,6 +243,7 @@ print(result.algorithm)
 | `health` | `` | `{ status }` | Health check. |
 | `list` | `prefix=None` | `{ status, count, paths }` | List secret paths, optionally filtered by prefix. Excludes deleted secrets. |
 | `ping` | `` | `{}` | Ping-pong. |
+| `purge` | `path` | `{ status, path, purged_at }` | Permanently remove a secret and all its versions. Irreversible — used for GDPR right-to-erasure compliance. After purge, GET returns not-found (not deleted). |
 | `put` | `path, value` | `{ status, path, version }` | Store a new version of a secret. Creates the secret if it doesn't exist. Undeletes if soft-deleted. |
 | `rotate` | `path` | `{ status, path, version }` | Re-encrypt the latest version with a new nonce. Creates a new version with the same plaintext. |
 | `versions` | `path` | `{ status, path, version_count, versions, deleted }` | Get version history for a secret. Includes deleted secrets. |

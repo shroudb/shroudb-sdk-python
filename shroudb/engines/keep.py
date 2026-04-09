@@ -82,6 +82,17 @@ class KeepNamespace:
         result = await self._transport.execute(self._engine, args)
         return result
 
+    async def purge(self, path: str) -> _types.KeepPurgeResponse:
+        """PURGE — Permanently remove a secret and all its versions. Irreversible — used for GDPR right-to-erasure compliance. After purge, GET returns not-found (not deleted)."""
+        args: list[str] = ["PURGE"]
+        args.append(str(path))
+        result = await self._transport.execute(self._engine, args)
+        return _types.KeepPurgeResponse(
+            status=result.get("status", ""),
+            path=result.get("path", None),
+            purged_at=result.get("purged_at", None),
+        )
+
     async def put(self, path: str, value: str | bytes) -> _types.KeepPutResponse:
         """PUT — Store a new version of a secret. Creates the secret if it doesn't exist. Undeletes if soft-deleted."""
         args: list[str] = ["PUT"]

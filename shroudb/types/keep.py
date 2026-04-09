@@ -53,6 +53,14 @@ class KeepListResponse:
     paths: list[Any]
 
 @dataclass(frozen=True)
+class KeepPurgeResponse:
+    """Response from ``keep.purge()``."""
+
+    status: str
+    path: str
+    purged_at: str
+
+@dataclass(frozen=True)
 class KeepPutResponse:
     """Response from ``keep.put()``."""
 
