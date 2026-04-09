@@ -32,6 +32,15 @@ class StashRevokeResponse:
     status: str
 
 @dataclass(frozen=True)
+class StashRewrapResponse:
+    """Response from ``stash.rewrap()``."""
+
+    id: str
+    key_version: int
+    status: str
+    updated_at: int
+
+@dataclass(frozen=True)
 class StashStoreResponse:
     """Response from ``stash.store()``."""
 

@@ -75,6 +75,18 @@ class StashNamespace:
             status=result.get("status", ""),
         )
 
+    async def rewrap(self, id_: str) -> _types.StashRewrapResponse:
+        """REWRAP — Re-wrap a blob's DEK under the current Cipher key version. The blob ciphertext is not re-encrypted — only the key wrapping changes."""
+        args: list[str] = ["REWRAP"]
+        args.append(str(id_))
+        result = await self._transport.execute(self._engine, args)
+        return _types.StashRewrapResponse(
+            id=result.get("id", ""),
+            key_version=result.get("key_version", 0),
+            status=result.get("status", ""),
+            updated_at=result.get("updated_at", 0),
+        )
+
     async def store(self, id_: str, data_b64: str, client_encrypted: str | None = None, content_type: str | None = None, keyring: str | None = None) -> _types.StashStoreResponse:
         """STORE — Store an encrypted blob"""
         args: list[str] = ["STORE"]

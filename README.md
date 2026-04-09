@@ -309,6 +309,7 @@ Encrypted blob storage with S3 backend and envelope encryption
 | `ping()` | Ping-pong |
 | `retrieve(id)` | Retrieve and decrypt a blob |
 | `revoke(id, **kwargs)` | Revoke a blob (hard crypto-shred by default, SOFT for soft revoke) |
+| `rewrap(id)` | Re-wrap a blob's DEK under the current Cipher key version. The blob ciphertext is not re-encrypted — only the key wrapping changes. |
 | `store(id, data_b64, **kwargs)` | Store an encrypted blob |
 
 ## Error Handling

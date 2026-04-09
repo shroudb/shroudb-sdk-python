@@ -318,6 +318,7 @@ print(result.ingested)
 | `ping` | `` | `{}` | Ping-pong |
 | `retrieve` | `id` | `{}` | Retrieve and decrypt a blob |
 | `revoke` | `id, **kwargs` | `{ id, revoke_mode, status }` | Revoke a blob (hard crypto-shred by default, SOFT for soft revoke) |
+| `rewrap` | `id` | `{ id, key_version, status, updated_at }` | Re-wrap a blob's DEK under the current Cipher key version. The blob ciphertext is not re-encrypted — only the key wrapping changes. |
 | `store` | `id, data_b64, **kwargs` | `{ client_encrypted, encrypted_size, id, key_version, keyring, plaintext_size, s3_key, status }` | Store an encrypted blob |
 
 ### Examples
