@@ -109,6 +109,14 @@ class SigilPasswordResetResponse:
     status: str
 
 @dataclass(frozen=True)
+class SigilSchemaAlterResponse:
+    """Response from ``sigil.SCHEMA_ALTER()``."""
+
+    fields: int
+    name: str
+    version: int
+
+@dataclass(frozen=True)
 class SigilSchemaGetResponse:
     """Response from ``sigil.SCHEMA_GET()``."""
 

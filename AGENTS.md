@@ -116,6 +116,7 @@ print(result.plaintext_key)
 | `password_change` | `schema, id, old, new` | `{ status }` | Sugar: change password. Infers credential field from schema. Equivalent to CREDENTIAL CHANGE with implicit field. |
 | `password_import` | `schema, id, hash, **kwargs` | `{ algorithm }` | Sugar: import pre-hashed password. Infers credential field from schema. Equivalent to CREDENTIAL IMPORT with implicit field. |
 | `password_reset` | `schema, id, new` | `{ status }` | Sugar: force-reset password. Infers credential field from schema. Equivalent to CREDENTIAL RESET with implicit field. |
+| `schema_alter` | `name, action, **kwargs` | `{ fields, name, version }` | Add or remove fields from a schema, producing a new version. Added fields are optional (required=false). Existing envelopes remain readable. |
 | `schema_get` | `name` | `{ schema }` | Get a schema definition by name |
 | `schema_list` | `` | `{ names }` | List all registered schema names |
 | `schema_register` | `name, json` | `{ version }` | Register a credential envelope schema |

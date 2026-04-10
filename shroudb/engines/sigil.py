@@ -179,6 +179,24 @@ class SigilNamespace:
         result = await self._transport.execute(self._engine, args)
         return _types.SigilPasswordResetResponse(status=result.get("status", ""))
 
+    async def schema_alter(self, name: str, action: str, field_json: dict[str, Any] | None = None, field_name: str | None = None) -> _types.SigilSchemaAlterResponse:
+        """SCHEMA ALTER — Add or remove fields from a schema, producing a new version. Added fields are optional (required=false). Existing envelopes remain readable."""
+        args: list[str] = ["SCHEMA", "ALTER"]
+        args.append(str(name))
+        args.append(str(action))
+        if field_json is not None:
+            args.append("FIELD_JSON")
+            args.append(field_json if isinstance(field_json, str) else json.dumps(field_json))
+        if field_name is not None:
+            args.append("FIELD_NAME")
+            args.append(str(field_name))
+        result = await self._transport.execute(self._engine, args)
+        return _types.SigilSchemaAlterResponse(
+            fields=result.get("fields", 0),
+            name=result.get("name", ""),
+            version=result.get("version", 0),
+        )
+
     async def schema_get(self, name: str) -> _types.SigilSchemaGetResponse:
         """SCHEMA GET — Get a schema definition by name"""
         args: list[str] = ["SCHEMA", "GET"]
