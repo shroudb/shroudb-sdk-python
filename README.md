@@ -311,6 +311,7 @@ Encrypted blob storage with S3 backend and envelope encryption
 | `command()` | List supported commands |
 | `health()` | Health check |
 | `inspect(id)` | Read blob metadata without downloading or decrypting |
+| `list(**kwargs)` | List blobs for the current tenant |
 | `ping()` | Ping-pong |
 | `retrieve(id)` | Retrieve and decrypt a blob |
 | `revoke(id, **kwargs)` | Revoke a blob (hard crypto-shred by default, SOFT for soft revoke) |

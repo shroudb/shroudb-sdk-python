@@ -49,6 +49,20 @@ class StashNamespace:
             viewer_count=result.get("viewer_count", 0),
         )
 
+    async def list(self, limit: int | None = None) -> _types.StashListResponse:
+        """LIST — List blobs for the current tenant"""
+        args: list[str] = ["LIST"]
+        if limit is not None:
+            args.append("LIMIT")
+            args.append(str(limit))
+        result = await self._transport.execute(self._engine, args)
+        return _types.StashListResponse(
+            blobs=result.get("blobs", None),
+            count=result.get("count", 0),
+            status=result.get("status", ""),
+            tenant=result.get("tenant", ""),
+        )
+
     async def ping(self) -> dict[str, Any]:
         """PING — Ping-pong"""
         args: list[str] = ["PING"]

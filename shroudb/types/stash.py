@@ -24,6 +24,15 @@ class StashInspectResponse:
     viewer_count: int
 
 @dataclass(frozen=True)
+class StashListResponse:
+    """Response from ``stash.list()``."""
+
+    blobs: list[Any]
+    count: int
+    status: str
+    tenant: str
+
+@dataclass(frozen=True)
 class StashRevokeResponse:
     """Response from ``stash.revoke()``."""
 
