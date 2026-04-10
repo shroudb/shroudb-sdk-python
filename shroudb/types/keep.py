@@ -69,6 +69,14 @@ class KeepPutResponse:
     version: str
 
 @dataclass(frozen=True)
+class KeepRekeyResponse:
+    """Response from ``keep.rekey()``."""
+
+    status: str
+    rekeyed_secrets: int
+    rekeyed_versions: int
+
+@dataclass(frozen=True)
 class KeepRotateResponse:
     """Response from ``keep.rotate()``."""
 

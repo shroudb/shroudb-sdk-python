@@ -105,6 +105,17 @@ class KeepNamespace:
             version=result.get("version", None),
         )
 
+    async def rekey(self, new_key: str) -> _types.KeepRekeyResponse:
+        """REKEY — Re-encrypt all secrets with a new master key. Iterates all secrets (including deleted ones), decrypts every version with the current master key, re-encrypts with the new key, and switches to the new key for all future operations."""
+        args: list[str] = ["REKEY"]
+        args.append(str(new_key))
+        result = await self._transport.execute(self._engine, args)
+        return _types.KeepRekeyResponse(
+            status=result.get("status", ""),
+            rekeyed_secrets=result.get("rekeyed_secrets", 0),
+            rekeyed_versions=result.get("rekeyed_versions", 0),
+        )
+
     async def rotate(self, path: str) -> _types.KeepRotateResponse:
         """ROTATE — Re-encrypt the latest version with a new nonce. Creates a new version with the same plaintext."""
         args: list[str] = ["ROTATE"]
