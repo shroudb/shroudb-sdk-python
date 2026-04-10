@@ -7,6 +7,15 @@ from typing import Any
 
 
 @dataclass(frozen=True)
+class StashFingerprintResponse:
+    """Response from ``stash.fingerprint()``."""
+
+    created_at: int
+    s3_key: str
+    status: str
+    viewer_id: str
+
+@dataclass(frozen=True)
 class StashInspectResponse:
     """Response from ``stash.inspect()``."""
 
@@ -61,3 +70,13 @@ class StashStoreResponse:
     plaintext_size: int
     s3_key: str
     status: str
+
+@dataclass(frozen=True)
+class StashTraceResponse:
+    """Response from ``stash.trace()``."""
+
+    blob_status: str
+    id: str
+    status: str
+    viewer_count: int
+    viewers: list[Any]

@@ -23,6 +23,22 @@ class StashNamespace:
         result = await self._transport.execute(self._engine, args)
         return result
 
+    async def fingerprint(self, id_: str, viewer_id: str, params: str | None = None) -> _types.StashFingerprintResponse:
+        """FINGERPRINT — Create a viewer-specific encrypted copy of a blob for leak tracing"""
+        args: list[str] = ["FINGERPRINT"]
+        args.append(str(id_))
+        args.append(str(viewer_id))
+        if params is not None:
+            args.append("PARAMS")
+            args.append(str(params))
+        result = await self._transport.execute(self._engine, args)
+        return _types.StashFingerprintResponse(
+            created_at=result.get("created_at", 0),
+            s3_key=result.get("s3_key", ""),
+            status=result.get("status", ""),
+            viewer_id=result.get("viewer_id", ""),
+        )
+
     async def health(self) -> dict[str, Any]:
         """HEALTH — Health check"""
         args: list[str] = ["HEALTH"]
@@ -125,4 +141,17 @@ class StashNamespace:
             plaintext_size=result.get("plaintext_size", 0),
             s3_key=result.get("s3_key", ""),
             status=result.get("status", ""),
+        )
+
+    async def trace(self, id_: str) -> _types.StashTraceResponse:
+        """TRACE — Return the viewer map (who has copies) for a blob"""
+        args: list[str] = ["TRACE"]
+        args.append(str(id_))
+        result = await self._transport.execute(self._engine, args)
+        return _types.StashTraceResponse(
+            blob_status=result.get("blob_status", ""),
+            id=result.get("id", ""),
+            status=result.get("status", ""),
+            viewer_count=result.get("viewer_count", 0),
+            viewers=result.get("viewers", None),
         )

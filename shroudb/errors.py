@@ -44,6 +44,9 @@ class ErrorCode:
     CIPHER_UNAVAILABLE: str = "CIPHER_UNAVAILABLE"
     """Cipher engine not available for envelope encryption"""
 
+    CLIENT_ENCRYPTED: str = "CLIENT_ENCRYPTED"
+    """Cannot fingerprint a client-encrypted blob (client manages encryption)"""
+
     CRYPTO: str = "CRYPTO"
     """Encryption or decryption failed"""
 
@@ -58,6 +61,9 @@ class ErrorCode:
 
     DISABLED: str = "DISABLED"
     """Keyring is disabled"""
+
+    DUPLICATE_VIEWER: str = "DUPLICATE_VIEWER"
+    """Viewer already has a fingerprinted copy of this blob"""
 
     ENCRYPTION: str = "ENCRYPTION"
     """Encryption or decryption failed"""
