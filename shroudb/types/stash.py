@@ -63,6 +63,8 @@ class StashStoreResponse:
     """Response from ``stash.store()``."""
 
     client_encrypted: bool
+    content_hash: str
+    deduplicated: bool
     encrypted_size: int
     id: str
     key_version: int

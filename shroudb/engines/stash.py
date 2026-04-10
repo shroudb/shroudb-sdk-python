@@ -134,6 +134,8 @@ class StashNamespace:
         result = await self._transport.execute(self._engine, args)
         return _types.StashStoreResponse(
             client_encrypted=result.get("client_encrypted", False),
+            content_hash=result.get("content_hash", None),
+            deduplicated=result.get("deduplicated", False),
             encrypted_size=result.get("encrypted_size", 0),
             id=result.get("id", ""),
             key_version=result.get("key_version", 0),
