@@ -194,6 +194,24 @@ class ShroudbNamespace:
         result = await self._transport.execute(self._engine, args)
         return _types.ShroudbPutResponse(version=result.get("version", 0))
 
+    async def rekey(self) -> _types.ShroudbRekeyResponse:
+        """REKEY — Begin online rekey (zero-downtime master key rotation)"""
+        args: list[str] = ["REKEY"]
+        result = await self._transport.execute(self._engine, args)
+        return _types.ShroudbRekeyResponse(message=result.get("message", ""))
+
+    async def rekey_status(self) -> _types.ShroudbRekeyStatusResponse:
+        """REKEY STATUS — Query progress of an in-flight rekey operation"""
+        args: list[str] = ["REKEY", "STATUS"]
+        result = await self._transport.execute(self._engine, args)
+        return _types.ShroudbRekeyStatusResponse(
+            in_progress=result.get("in_progress", False),
+            progress=result.get("progress", ""),
+            segments_completed=result.get("segments_completed", 0),
+            started_at=result.get("started_at", 0),
+            total_segments=result.get("total_segments", 0),
+        )
+
     async def subscribe(self, namespace: str, key: str | None = None, events: str | None = None) -> dict[str, Any]:
         """SUBSCRIBE — Subscribe to change events on a namespace"""
         args: list[str] = ["SUBSCRIBE"]

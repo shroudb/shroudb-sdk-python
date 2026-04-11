@@ -90,6 +90,22 @@ class ShroudbPutResponse:
     version: int
 
 @dataclass(frozen=True)
+class ShroudbRekeyResponse:
+    """Response from ``shroudb.REKEY()``."""
+
+    message: str
+
+@dataclass(frozen=True)
+class ShroudbRekeyStatusResponse:
+    """Response from ``shroudb.REKEY STATUS()``."""
+
+    in_progress: bool
+    progress: str
+    segments_completed: int
+    started_at: int
+    total_segments: int
+
+@dataclass(frozen=True)
 class ShroudbVersionsResponse:
     """Response from ``shroudb.VERSIONS()``."""
 
