@@ -219,7 +219,7 @@ class SigilNamespace:
         return _types.SigilSchemaRegisterResponse(version=result.get("version", 0))
 
     async def session_create(self, schema: str, id_: str, password: str, meta: dict[str, Any] | None = None) -> _types.SigilSessionCreateResponse:
-        """SESSION CREATE — Verify credentials and issue access + refresh tokens"""
+        """SESSION CREATE — Verify credentials and issue access + refresh tokens. Fields annotated with claim=true are auto-included in the JWT from the entity's envelope. Enriched claim values override caller-provided META for the same key."""
         args: list[str] = ["SESSION", "CREATE"]
         args.append(str(schema))
         args.append(str(id_))
@@ -243,7 +243,7 @@ class SigilNamespace:
         return _types.SigilSessionListResponse(sessions=result.get("sessions", None))
 
     async def session_refresh(self, schema: str, token: str) -> _types.SigilSessionRefreshResponse:
-        """SESSION REFRESH — Rotate refresh token and issue new access token"""
+        """SESSION REFRESH — Rotate refresh token and issue new access token. Fields annotated with claim=true are re-read from the entity's current envelope, so refreshed tokens reflect the latest values (e.g. role changes)."""
         args: list[str] = ["SESSION", "REFRESH"]
         args.append(str(schema))
         args.append(str(token))

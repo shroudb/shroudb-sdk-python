@@ -122,9 +122,9 @@ print(result.plaintext_key)
 | `schema_get` | `name` | `{ schema }` | Get a schema definition by name |
 | `schema_list` | `` | `{ names }` | List all registered schema names |
 | `schema_register` | `name, json` | `{ version }` | Register a credential envelope schema |
-| `session_create` | `schema, id, password, **kwargs` | `{ access_token, expires_in, refresh_token }` | Verify credentials and issue access + refresh tokens |
+| `session_create` | `schema, id, password, **kwargs` | `{ access_token, expires_in, refresh_token }` | Verify credentials and issue access + refresh tokens. Fields annotated with claim=true are auto-included in the JWT from the entity's envelope. Enriched claim values override caller-provided META for the same key. |
 | `session_list` | `schema, id` | `{ sessions }` | List active sessions for an entity |
-| `session_refresh` | `schema, token` | `{ access_token, expires_in, refresh_token }` | Rotate refresh token and issue new access token |
+| `session_refresh` | `schema, token` | `{ access_token, expires_in, refresh_token }` | Rotate refresh token and issue new access token. Fields annotated with claim=true are re-read from the entity's current envelope, so refreshed tokens reflect the latest values (e.g. role changes). |
 | `session_revoke` | `schema, token` | `{ status }` | Revoke a single refresh token (logout one session) |
 | `session_revoke_all` | `schema, id` | `{ revoked }` | Revoke all sessions for an entity (logout everywhere) |
 | `user_create` | `schema, id, json` | `{ created_at, fields, user_id }` | Sugar: create an envelope. Equivalent to ENVELOPE CREATE. |
