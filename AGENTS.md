@@ -380,7 +380,7 @@ except ShrouDBError as err:
 | `POLICY` | Operation denied by keyring policy |
 | `RETIRED` | Key version is retired — use REWRAP |
 | `WRONGTYPE` | Operation not supported for this keyring type |
-| `ACCOUNT_LOCKED` | Account locked after too many failed attempts |
+| `ACCOUNT_LOCKED` | Account locked after too many failed attempts. Only emitted for credential fields with the default lockout=true annotation. |
 | `CAPABILITY_MISSING` | Required engine capability not available (e.g., Cipher for PII fields) |
 | `ENTITY_EXISTS` | Entity already exists |
 | `ENTITY_NOT_FOUND` | Entity does not exist |
