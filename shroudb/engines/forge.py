@@ -22,6 +22,7 @@ class ForgeNamespace:
         args: list[str] = ["CA", "CREATE"]
         args.append(str(name))
         args.append(str(algorithm))
+        args.append("SUBJECT")
         args.append(str(subject))
         if ttl_days is not None:
             args.append("TTL_DAYS")

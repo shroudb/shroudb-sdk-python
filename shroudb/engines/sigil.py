@@ -183,6 +183,7 @@ class SigilNamespace:
         """SCHEMA ALTER — Add or remove fields from a schema, producing a new version. Added fields are optional (required=false). Existing envelopes remain readable."""
         args: list[str] = ["SCHEMA", "ALTER"]
         args.append(str(name))
+        args.append("ADD")
         args.append(str(action))
         if field_json is not None:
             args.append("FIELD_JSON")
