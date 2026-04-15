@@ -296,17 +296,18 @@ print(result.channel_type)
 
 | Method | Args | Returns | Description |
 |--------|------|---------|-------------|
-| `actors` | `**kwargs` | `{ entries }` | Active actors in time window |
+| `actors` | `**kwargs` | `{ actors, status }` | Top 20 actors by event count in the given time window |
 | `auth` | `token` | `{ status }` | Authenticate this connection |
-| `count` | `**kwargs` | `{ count }` | Count events matching filter predicates |
-| `errors` | `**kwargs` | `{ entries }` | Error rates by action |
-| `health` | `` | `{ status }` | Health check |
-| `hotspots` | `**kwargs` | `{ entries }` | Top actors by event volume |
+| `command_list` | `` | `{ commands }` | List available commands |
+| `count` | `**kwargs` | `{ count, scanned, status }` | Count events matching filter predicates |
+| `errors` | `**kwargs` | `{ errors, status }` | Operations ranked by error rate in the given time window |
+| `health` | `` | `{ events, status }` | Health check |
+| `hotspots` | `**kwargs` | `{ hotspots, status }` | Top 20 resources by access count in the given time window |
 | `ingest` | `event_json` | `{ status }` | Ingest a single structured audit event |
 | `ingest_batch` | `events_json` | `{ ingested, status }` | Ingest multiple events in a single call |
 | `ping` | `` | `{}` | Keepalive |
-| `query` | `**kwargs` | `{ events }` | Query events with filter predicates |
-| `verify` | `` | `{ status, total, verified }` | Verify the cryptographic hash chain integrity of all events. Returns the number of verified events or an error if tampering is detected. |
+| `query` | `**kwargs` | `{ events, matched, scanned, status }` | Query events with filter predicates |
+| `verify` | `` | `{ per_tenant, status, total, verified }` | Verify the cryptographic hash chain integrity of all events. Returns per-tenant and aggregate verified counts or an error if tampering is detected. |
 
 ### Examples
 

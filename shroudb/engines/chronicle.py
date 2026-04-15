@@ -18,13 +18,13 @@ class ChronicleNamespace:
         self._engine = engine
 
     async def actors(self, filter_args: str | None = None) -> _types.ChronicleActorsResponse:
-        """ACTORS — Active actors in time window"""
+        """ACTORS — Top 20 actors by event count in the given time window"""
         args: list[str] = ["ACTORS"]
         if filter_args is not None:
             args.append("FILTER_ARGS")
             args.append(str(filter_args))
         result = await self._transport.execute(self._engine, args)
-        return _types.ChronicleActorsResponse(entries=result.get("entries", None))
+        return _types.ChronicleActorsResponse(actors=result.get("actors", None), status=result.get("status", ""))
 
     async def auth(self, token: str) -> _types.ChronicleAuthResponse:
         """AUTH — Authenticate this connection"""
@@ -33,6 +33,12 @@ class ChronicleNamespace:
         result = await self._transport.execute(self._engine, args)
         return _types.ChronicleAuthResponse(status=result.get("status", ""))
 
+    async def command_list(self) -> _types.ChronicleCommandListResponse:
+        """COMMAND LIST — List available commands"""
+        args: list[str] = ["COMMAND", "LIST"]
+        result = await self._transport.execute(self._engine, args)
+        return _types.ChronicleCommandListResponse(commands=result.get("commands", None))
+
     async def count(self, filter_args: str | None = None) -> _types.ChronicleCountResponse:
         """COUNT — Count events matching filter predicates"""
         args: list[str] = ["COUNT"]
@@ -40,31 +46,35 @@ class ChronicleNamespace:
             args.append("FILTER_ARGS")
             args.append(str(filter_args))
         result = await self._transport.execute(self._engine, args)
-        return _types.ChronicleCountResponse(count=result.get("count", 0))
+        return _types.ChronicleCountResponse(
+            count=result.get("count", 0),
+            scanned=result.get("scanned", 0),
+            status=result.get("status", ""),
+        )
 
     async def errors(self, filter_args: str | None = None) -> _types.ChronicleErrorsResponse:
-        """ERRORS — Error rates by action"""
+        """ERRORS — Operations ranked by error rate in the given time window"""
         args: list[str] = ["ERRORS"]
         if filter_args is not None:
             args.append("FILTER_ARGS")
             args.append(str(filter_args))
         result = await self._transport.execute(self._engine, args)
-        return _types.ChronicleErrorsResponse(entries=result.get("entries", None))
+        return _types.ChronicleErrorsResponse(errors=result.get("errors", None), status=result.get("status", ""))
 
     async def health(self) -> _types.ChronicleHealthResponse:
         """HEALTH — Health check"""
         args: list[str] = ["HEALTH"]
         result = await self._transport.execute(self._engine, args)
-        return _types.ChronicleHealthResponse(status=result.get("status", ""))
+        return _types.ChronicleHealthResponse(events=result.get("events", 0), status=result.get("status", ""))
 
     async def hotspots(self, filter_args: str | None = None) -> _types.ChronicleHotspotsResponse:
-        """HOTSPOTS — Top actors by event volume"""
+        """HOTSPOTS — Top 20 resources by access count in the given time window"""
         args: list[str] = ["HOTSPOTS"]
         if filter_args is not None:
             args.append("FILTER_ARGS")
             args.append(str(filter_args))
         result = await self._transport.execute(self._engine, args)
-        return _types.ChronicleHotspotsResponse(entries=result.get("entries", None))
+        return _types.ChronicleHotspotsResponse(hotspots=result.get("hotspots", None), status=result.get("status", ""))
 
     async def ingest(self, event_json: dict[str, Any]) -> _types.ChronicleIngestResponse:
         """INGEST — Ingest a single structured audit event"""
@@ -93,13 +103,19 @@ class ChronicleNamespace:
             args.append("FILTER_ARGS")
             args.append(str(filter_args))
         result = await self._transport.execute(self._engine, args)
-        return _types.ChronicleQueryResponse(events=result.get("events", None))
+        return _types.ChronicleQueryResponse(
+            events=result.get("events", None),
+            matched=result.get("matched", 0),
+            scanned=result.get("scanned", 0),
+            status=result.get("status", ""),
+        )
 
     async def verify(self) -> _types.ChronicleVerifyResponse:
-        """VERIFY — Verify the cryptographic hash chain integrity of all events. Returns the number of verified events or an error if tampering is detected."""
+        """VERIFY — Verify the cryptographic hash chain integrity of all events. Returns per-tenant and aggregate verified counts or an error if tampering is detected."""
         args: list[str] = ["VERIFY"]
         result = await self._transport.execute(self._engine, args)
         return _types.ChronicleVerifyResponse(
+            per_tenant=result.get("per_tenant", None),
             status=result.get("status", ""),
             total=result.get("total", 0),
             verified=result.get("verified", 0),

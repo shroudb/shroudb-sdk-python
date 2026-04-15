@@ -10,7 +10,8 @@ from typing import Any
 class ChronicleActorsResponse:
     """Response from ``chronicle.ACTORS()``."""
 
-    entries: list[Any]
+    actors: list[Any]
+    status: str
 
 @dataclass(frozen=True)
 class ChronicleAuthResponse:
@@ -19,28 +20,39 @@ class ChronicleAuthResponse:
     status: str
 
 @dataclass(frozen=True)
+class ChronicleCommandListResponse:
+    """Response from ``chronicle.COMMAND_LIST()``."""
+
+    commands: list[Any]
+
+@dataclass(frozen=True)
 class ChronicleCountResponse:
     """Response from ``chronicle.COUNT()``."""
 
     count: int
+    scanned: int
+    status: str
 
 @dataclass(frozen=True)
 class ChronicleErrorsResponse:
     """Response from ``chronicle.ERRORS()``."""
 
-    entries: list[Any]
+    errors: list[Any]
+    status: str
 
 @dataclass(frozen=True)
 class ChronicleHealthResponse:
     """Response from ``chronicle.HEALTH()``."""
 
+    events: int
     status: str
 
 @dataclass(frozen=True)
 class ChronicleHotspotsResponse:
     """Response from ``chronicle.HOTSPOTS()``."""
 
-    entries: list[Any]
+    hotspots: list[Any]
+    status: str
 
 @dataclass(frozen=True)
 class ChronicleIngestResponse:
@@ -60,11 +72,15 @@ class ChronicleQueryResponse:
     """Response from ``chronicle.QUERY()``."""
 
     events: list[Any]
+    matched: int
+    scanned: int
+    status: str
 
 @dataclass(frozen=True)
 class ChronicleVerifyResponse:
     """Response from ``chronicle.VERIFY()``."""
 
+    per_tenant: dict[str, Any]
     status: str
     total: int
     verified: int
