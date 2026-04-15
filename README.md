@@ -158,7 +158,7 @@ Schema-driven credential envelope engine
 | `credential_change(schema, id, field, old, new)` | Change a credential field (requires old value for verification) |
 | `credential_import(schema, id, field, hash, **kwargs)` | Import a pre-hashed credential (bcrypt, scrypt, argon2). Transparently rehashed to Argon2id on next verify. |
 | `credential_reset(schema, id, field, new)` | Force-reset a credential field without requiring old value (admin/reset token) |
-| `envelope_create(schema, id, json)` | Create an envelope with field routing per schema annotations |
+| `envelope_create(schema, id, json)` | Create an envelope with field routing per schema kind |
 | `envelope_delete(schema, id)` | Delete an envelope and all associated data |
 | `envelope_get(schema, id)` | Get an envelope record |
 | `envelope_import(schema, id, json)` | Import an envelope with pre-hashed credential fields. Non-credential fields processed normally. |

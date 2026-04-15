@@ -24,7 +24,7 @@ class ErrorCode:
     """Known ShrouDB error codes."""
 
     ACCOUNT_LOCKED: str = "ACCOUNT_LOCKED"
-    """Account locked after too many failed attempts. Only emitted for credential fields with the default lockout=true annotation."""
+    """Account locked after too many failed attempts. Only emitted for credential fields whose CredentialPolicy carries a non-null LockoutPolicy."""
 
     ADAPTER: str = "ADAPTER"
     """Delivery adapter failure"""

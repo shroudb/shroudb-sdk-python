@@ -52,7 +52,7 @@ class SigilNamespace:
         return _types.SigilCredentialResetResponse(status=result.get("status", ""))
 
     async def envelope_create(self, schema: str, id_: str, json_data: dict[str, Any]) -> _types.SigilEnvelopeCreateResponse:
-        """ENVELOPE CREATE — Create an envelope with field routing per schema annotations"""
+        """ENVELOPE CREATE — Create an envelope with field routing per schema kind"""
         args: list[str] = ["ENVELOPE", "CREATE"]
         args.append(str(schema))
         args.append(str(id_))

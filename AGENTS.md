@@ -106,7 +106,7 @@ print(result.plaintext_key)
 | `credential_change` | `schema, id, field, old, new` | `{ status }` | Change a credential field (requires old value for verification) |
 | `credential_import` | `schema, id, field, hash, **kwargs` | `{ algorithm }` | Import a pre-hashed credential (bcrypt, scrypt, argon2). Transparently rehashed to Argon2id on next verify. |
 | `credential_reset` | `schema, id, field, new` | `{ status }` | Force-reset a credential field without requiring old value (admin/reset token) |
-| `envelope_create` | `schema, id, json` | `{ created_at, fields, id }` | Create an envelope with field routing per schema annotations |
+| `envelope_create` | `schema, id, json` | `{ created_at, fields, id }` | Create an envelope with field routing per schema kind |
 | `envelope_delete` | `schema, id` | `{ status }` | Delete an envelope and all associated data |
 | `envelope_get` | `schema, id` | `{ created_at, fields, id, updated_at }` | Get an envelope record |
 | `envelope_import` | `schema, id, json` | `{ created_at, fields, id }` | Import an envelope with pre-hashed credential fields. Non-credential fields processed normally. |
@@ -380,7 +380,7 @@ except ShrouDBError as err:
 | `POLICY` | Operation denied by keyring policy |
 | `RETIRED` | Key version is retired — use REWRAP |
 | `WRONGTYPE` | Operation not supported for this keyring type |
-| `ACCOUNT_LOCKED` | Account locked after too many failed attempts. Only emitted for credential fields with the default lockout=true annotation. |
+| `ACCOUNT_LOCKED` | Account locked after too many failed attempts. Only emitted for credential fields whose CredentialPolicy carries a non-null LockoutPolicy. |
 | `CAPABILITY_MISSING` | Required engine capability not available (e.g., Cipher for PII fields) |
 | `ENTITY_EXISTS` | Entity already exists |
 | `ENTITY_NOT_FOUND` | Entity does not exist |
