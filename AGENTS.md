@@ -75,64 +75,67 @@ print(result.version)
 |--------|------|---------|-------------|
 | `auth` | `token` | `{ status }` | Authenticate the connection |
 | `command_list` | `` | `{ count, commands }` | List all supported commands |
-| `decrypt` | `keyring, ciphertext, **kwargs` | `{ plaintext }` | Decrypt ciphertext using the embedded key version |
-| `encrypt` | `keyring, plaintext, **kwargs` | `{ ciphertext, key_version }` | Encrypt plaintext with the active key version |
-| `generate_data_key` | `keyring, **kwargs` | `{ plaintext_key, wrapped_key, key_version }` | Generate a data encryption key (envelope encryption pattern) |
+| `decrypt` | `keyring, ciphertext, **kwargs` | `{ status, plaintext }` | Decrypt ciphertext using the embedded key version |
+| `encrypt` | `keyring, plaintext, **kwargs` | `{ status, ciphertext, key_version }` | Encrypt plaintext with the active key version |
+| `generate_data_key` | `keyring, **kwargs` | `{ status, plaintext_key, wrapped_key, key_version }` | Generate a data encryption key (envelope encryption pattern) |
 | `health` | `` | `{ status }` | Check server health |
 | `key_info` | `keyring` | `{ keyring, algorithm, active_version, versions }` | Get keyring metadata and key version information |
-| `keyring_create` | `name, algorithm, **kwargs` | `{ keyring, algorithm, active_version }` | Create a new keyring with its first active key |
+| `keyring_create` | `name, algorithm, **kwargs` | `{ status, keyring, algorithm, active_version }` | Create a new keyring with its first active key |
 | `keyring_list` | `` | `{ keyrings }` | List all keyring names |
-| `ping` | `` | `{ message }` | Simple connectivity check — returns PONG |
-| `rewrap` | `keyring, ciphertext, **kwargs` | `{ ciphertext, key_version }` | Re-encrypt ciphertext with the current active key version |
-| `rotate` | `keyring, **kwargs` | `{ rotated, key_version, previous_version }` | Rotate the keyring to a new key version |
-| `sign` | `keyring, data` | `{ signature, key_version }` | Create a detached signature |
-| `verify_signature` | `keyring, data, signature` | `{ valid }` | Verify a detached signature |
+| `ping` | `` | `{ pong }` | Simple connectivity check — returns PONG |
+| `rewrap` | `keyring, ciphertext, **kwargs` | `{ status, ciphertext, key_version }` | Re-encrypt ciphertext with the current active key version |
+| `rotate` | `keyring, **kwargs` | `{ status, rotated, key_version, previous_version }` | Rotate the keyring to a new key version |
+| `sign` | `keyring, data` | `{ status, signature, key_version }` | Create a detached signature |
+| `verify_signature` | `keyring, data, signature` | `{ status, valid }` | Verify a detached signature |
 
 ### Examples
 
 ```python
 result = await db.cipher.decrypt("my-keyring", "k3Xm:encrypted...")
-print(result.plaintext)
+print(result.status)
 result = await db.cipher.encrypt("my-keyring", "SGVsbG8=")
-print(result.ciphertext)
+print(result.status)
 result = await db.cipher.generate_data_key("my-keyring")
-print(result.plaintext_key)
+print(result.status)
 ```
 
 ## `db.sigil` — Schema-driven credential envelope engine
 
 | Method | Args | Returns | Description |
 |--------|------|---------|-------------|
+| `auth` | `token` | `{ status }` | Authenticate the current TCP connection with a bearer token. Handled at the connection layer, not dispatched to the engine. HTTP transport uses the Authorization: Bearer header instead. |
 | `credential_change` | `schema, id, field, old, new` | `{ status }` | Change a credential field (requires old value for verification) |
-| `credential_import` | `schema, id, field, hash, **kwargs` | `{ algorithm }` | Import a pre-hashed credential (bcrypt, scrypt, argon2). Transparently rehashed to Argon2id on next verify. |
+| `credential_import` | `schema, id, field, hash, **kwargs` | `{ algorithm, status }` | Import a pre-hashed credential (bcrypt, scrypt, argon2). Transparently rehashed to Argon2id on next verify. |
 | `credential_reset` | `schema, id, field, new` | `{ status }` | Force-reset a credential field without requiring old value (admin/reset token) |
-| `envelope_create` | `schema, id, json` | `{ created_at, fields, id }` | Create an envelope with field routing per schema kind |
+| `envelope_create` | `schema, id, json` | `{ created_at, entity_id, fields, status }` | Create an envelope with field routing per schema kind |
 | `envelope_delete` | `schema, id` | `{ status }` | Delete an envelope and all associated data |
-| `envelope_get` | `schema, id` | `{ created_at, fields, id, updated_at }` | Get an envelope record |
-| `envelope_import` | `schema, id, json` | `{ created_at, fields, id }` | Import an envelope with pre-hashed credential fields. Non-credential fields processed normally. |
-| `envelope_lookup` | `schema, field, value` | `{ created_at, fields, id, updated_at }` | Look up an envelope by indexed or searchable field value |
-| `envelope_update` | `schema, id, json` | `{ fields, id, updated_at }` | Update non-credential fields on an existing envelope |
-| `envelope_verify` | `schema, id, field, value` | `{ valid }` | Verify a credential field on an envelope by explicit field name |
+| `envelope_get` | `schema, id` | `{ created_at, entity_id, fields, updated_at }` | Get an envelope record |
+| `envelope_import` | `schema, id, json` | `{ created_at, entity_id, fields, status }` | Import an envelope with pre-hashed credential fields. Non-credential fields processed normally. |
+| `envelope_lookup` | `schema, field, value` | `{ entity_id, status }` | Look up an envelope by indexed or searchable field value. Returns the matched entity ID only. |
+| `envelope_update` | `schema, id, json` | `{ entity_id, fields, status, updated_at }` | Update non-credential fields on an existing envelope |
+| `envelope_verify` | `schema, id, field, value` | `{ status, valid }` | Verify a credential field on an envelope by explicit field name |
 | `health` | `` | `{ status }` | Health check |
-| `jwks` | `schema` | `{ keys }` | Get the JSON Web Key Set for external token verification |
+| `jwks` | `schema` | `{}` | Get the JSON Web Key Set for external token verification |
 | `password_change` | `schema, id, old, new` | `{ status }` | Sugar: change password. Infers credential field from schema. Equivalent to CREDENTIAL CHANGE with implicit field. |
-| `password_import` | `schema, id, hash, **kwargs` | `{ algorithm }` | Sugar: import pre-hashed password. Infers credential field from schema. Equivalent to CREDENTIAL IMPORT with implicit field. |
+| `password_import` | `schema, id, hash, **kwargs` | `{ algorithm, status }` | Sugar: import pre-hashed password. Infers credential field from schema. Equivalent to CREDENTIAL IMPORT with implicit field. |
 | `password_reset` | `schema, id, new` | `{ status }` | Sugar: force-reset password. Infers credential field from schema. Equivalent to CREDENTIAL RESET with implicit field. |
-| `schema_alter` | `name, action, **kwargs` | `{ fields, name, version }` | Add or remove fields from a schema, producing a new version. Added fields are optional (required=false). Existing envelopes remain readable. |
-| `schema_get` | `name` | `{ schema }` | Get a schema definition by name |
-| `schema_list` | `` | `{ names }` | List all registered schema names |
-| `schema_register` | `name, json` | `{ version }` | Register a credential envelope schema |
-| `session_create` | `schema, id, password, **kwargs` | `{ access_token, expires_in, refresh_token }` | Verify credentials and issue access + refresh tokens. Fields annotated with claim=true are auto-included in the JWT from the entity's envelope. Enriched claim values override caller-provided META for the same key. |
-| `session_list` | `schema, id` | `{ sessions }` | List active sessions for an entity |
-| `session_refresh` | `schema, token` | `{ access_token, expires_in, refresh_token }` | Rotate refresh token and issue new access token. Fields annotated with claim=true are re-read from the entity's current envelope, so refreshed tokens reflect the latest values (e.g. role changes). |
+| `schema_alter` | `name, action, **kwargs` | `{ fields, name, status, version }` | Add or remove fields from a schema, producing a new version. Added fields are optional (required=false). Existing envelopes remain readable. |
+| `schema_get` | `name` | `{}` | Get a schema definition by name |
+| `schema_list` | `` | `{}` | List all registered schema names |
+| `schema_register` | `name, json` | `{ status, version }` | Register a credential envelope schema |
+| `session_create` | `schema, id, password, **kwargs` | `{ access_token, expires_in, refresh_token, status }` | Verify credentials and issue access + refresh tokens. Fields annotated with claim=true are auto-included in the JWT from the entity's envelope. Enriched claim values override caller-provided META for the same key. |
+| `session_list` | `schema, id` | `{}` | List active sessions for an entity |
+| `session_login` | `schema, field, value, password, **kwargs` | `{ access_token, expires_in, refresh_token, status }` | Verify credentials by indexed field value (e.g., email) and issue access + refresh tokens. Same claim enrichment as SESSION CREATE. |
+| `session_refresh` | `schema, token` | `{ access_token, expires_in, refresh_token, status }` | Rotate refresh token and issue new access token. Fields annotated with claim=true are re-read from the entity's current envelope, so refreshed tokens reflect the latest values (e.g. role changes). |
 | `session_revoke` | `schema, token` | `{ status }` | Revoke a single refresh token (logout one session) |
-| `session_revoke_all` | `schema, id` | `{ revoked }` | Revoke all sessions for an entity (logout everywhere) |
-| `user_create` | `schema, id, json` | `{ created_at, fields, user_id }` | Sugar: create an envelope. Equivalent to ENVELOPE CREATE. |
+| `session_revoke_all` | `schema, id` | `{ revoked, status }` | Revoke all sessions for an entity (logout everywhere) |
+| `user_create` | `schema, id, json` | `{ created_at, entity_id, fields, status }` | Sugar: create an envelope. Equivalent to ENVELOPE CREATE. |
 | `user_delete` | `schema, id` | `{ status }` | Sugar: delete an envelope. Equivalent to ENVELOPE DELETE. |
-| `user_get` | `schema, id` | `{ created_at, fields, updated_at, user_id }` | Sugar: get an envelope. Equivalent to ENVELOPE GET. |
-| `user_import` | `schema, id, json` | `{ created_at, fields, user_id }` | Sugar: import an envelope with pre-hashed credentials. Equivalent to ENVELOPE IMPORT. |
-| `user_update` | `schema, id, json` | `{ fields, updated_at, user_id }` | Sugar: update non-credential fields. Equivalent to ENVELOPE UPDATE. |
-| `user_verify` | `schema, id, password` | `{ valid }` | Sugar: verify credential. Infers the credential field from schema. Equivalent to ENVELOPE VERIFY with implicit field. |
+| `user_get` | `schema, id` | `{ created_at, entity_id, fields, updated_at }` | Sugar: get an envelope. Equivalent to ENVELOPE GET. |
+| `user_import` | `schema, id, json` | `{ created_at, entity_id, fields, status }` | Sugar: import an envelope with pre-hashed credentials. Equivalent to ENVELOPE IMPORT. |
+| `user_lookup` | `schema, field, value` | `{ entity_id, status }` | Sugar: look up by indexed or searchable field value. Equivalent to ENVELOPE LOOKUP. |
+| `user_update` | `schema, id, json` | `{ entity_id, fields, status, updated_at }` | Sugar: update non-credential fields. Equivalent to ENVELOPE UPDATE. |
+| `user_verify` | `schema, id, password` | `{ status, valid }` | Sugar: verify credential. Infers the credential field from schema. Equivalent to ENVELOPE VERIFY with implicit field. |
 
 ### Examples
 
@@ -145,7 +148,7 @@ result = await db.sigil.credential_reset("myapp", "alice", "email", "new")
 print(result.status)
 ```
 
-## `db.veil` — veil
+## `db.veil` — Searchable encryption with blind indexing
 
 | Method | Args | Returns | Description |
 |--------|------|---------|-------------|
@@ -176,7 +179,7 @@ result = await db.veil.index_destroy("my-keyring")
 print(result.status)
 ```
 
-## `db.sentry` — sentry
+## `db.sentry` — Policy-based authorization engine
 
 | Method | Args | Returns | Description |
 |--------|------|---------|-------------|
@@ -210,17 +213,22 @@ print(result.status)
 
 | Method | Args | Returns | Description |
 |--------|------|---------|-------------|
+| `auth` | `token` | `{ status }` | Authenticate this connection with a token |
 | `ca_create` | `name, algorithm, subject, **kwargs` | `{ active_version, algorithm, name, subject }` | Create a new Certificate Authority |
 | `ca_export` | `name` | `{ certificate_pem }` | Export the active CA certificate (PEM) |
 | `ca_info` | `name` | `{ algorithm, key_versions, name, subject }` | Get CA metadata and key version status |
 | `ca_list` | `` | `{ cas }` | List all Certificate Authorities |
 | `ca_rotate` | `name, **kwargs` | `{ key_version, previous_version, rotated }` | Rotate CA signing key |
+| `command` | `` | `{ commands }` | List supported commands |
 | `config_get` | `key` | `{ key, status, value }` | Get a runtime configuration value |
 | `config_set` | `key, value` | `{ key, status, value }` | Set a runtime configuration value (only scheduler_interval_secs is mutable) |
+| `health` | `` | `{ status }` | Health check |
 | `inspect` | `ca, serial` | `{ certificate_pem, serial, state, subject }` | Get certificate details |
 | `issue` | `ca, subject, profile, **kwargs` | `{ certificate_pem, private_key_pem, serial }` | Issue a new certificate. Returns cert + private key (private key never stored). |
 | `issue_from_csr` | `ca, csr_pem, profile, **kwargs` | `{ certificate_pem, serial }` | Issue a certificate from a PEM-encoded CSR |
 | `list_certs` | `ca, **kwargs` | `{ certs, count }` | List certificates for a CA |
+| `ping` | `` | `{ status }` | Liveness probe. Returns PONG. |
+| `regenerate_crl` | `ca` | `{ status }` | Force regeneration of the CRL for a CA. Also accepted as `CA REGENERATE_CRL <name>`. |
 | `renew` | `ca, serial, **kwargs` | `{ certificate_pem, private_key_pem, serial }` | Renew a certificate (re-issue with same profile and SANs) |
 | `revoke` | `ca, serial, **kwargs` | `{ status }` | Revoke a certificate |
 
@@ -322,6 +330,7 @@ print(result.ingested)
 
 | Method | Args | Returns | Description |
 |--------|------|---------|-------------|
+| `auth` | `token` | `{}` | Authenticate this connection with a token |
 | `command` | `` | `{}` | List supported commands |
 | `fingerprint` | `id, viewer_id, **kwargs` | `{ created_at, s3_key, status, viewer_id }` | Create a viewer-specific encrypted copy of a blob for leak tracing |
 | `health` | `` | `{}` | Health check |
@@ -411,6 +420,7 @@ except ShrouDBError as err:
 | `OBJECT_STORE` | S3 object store operation failed |
 | `REVOKED` | Blob has been soft-revoked |
 | `SHREDDED` | Blob has been crypto-shredded (unrecoverable) |
+| `STORE` | ShrouDB Store (metadata) operation failed |
 
 ## Common Mistakes
 

@@ -155,6 +155,7 @@ Schema-driven credential envelope engine
 
 | Method | Description |
 |--------|-------------|
+| `auth(token)` | Authenticate the current TCP connection with a bearer token. Handled at the connection layer, not dispatched to the engine. HTTP transport uses the Authorization: Bearer header instead. |
 | `credential_change(schema, id, field, old, new)` | Change a credential field (requires old value for verification) |
 | `credential_import(schema, id, field, hash, **kwargs)` | Import a pre-hashed credential (bcrypt, scrypt, argon2). Transparently rehashed to Argon2id on next verify. |
 | `credential_reset(schema, id, field, new)` | Force-reset a credential field without requiring old value (admin/reset token) |
@@ -162,7 +163,7 @@ Schema-driven credential envelope engine
 | `envelope_delete(schema, id)` | Delete an envelope and all associated data |
 | `envelope_get(schema, id)` | Get an envelope record |
 | `envelope_import(schema, id, json)` | Import an envelope with pre-hashed credential fields. Non-credential fields processed normally. |
-| `envelope_lookup(schema, field, value)` | Look up an envelope by indexed or searchable field value |
+| `envelope_lookup(schema, field, value)` | Look up an envelope by indexed or searchable field value. Returns the matched entity ID only. |
 | `envelope_update(schema, id, json)` | Update non-credential fields on an existing envelope |
 | `envelope_verify(schema, id, field, value)` | Verify a credential field on an envelope by explicit field name |
 | `health()` | Health check |
@@ -176,6 +177,7 @@ Schema-driven credential envelope engine
 | `schema_register(name, json)` | Register a credential envelope schema |
 | `session_create(schema, id, password, **kwargs)` | Verify credentials and issue access + refresh tokens. Fields annotated with claim=true are auto-included in the JWT from the entity's envelope. Enriched claim values override caller-provided META for the same key. |
 | `session_list(schema, id)` | List active sessions for an entity |
+| `session_login(schema, field, value, password, **kwargs)` | Verify credentials by indexed field value (e.g., email) and issue access + refresh tokens. Same claim enrichment as SESSION CREATE. |
 | `session_refresh(schema, token)` | Rotate refresh token and issue new access token. Fields annotated with claim=true are re-read from the entity's current envelope, so refreshed tokens reflect the latest values (e.g. role changes). |
 | `session_revoke(schema, token)` | Revoke a single refresh token (logout one session) |
 | `session_revoke_all(schema, id)` | Revoke all sessions for an entity (logout everywhere) |
@@ -183,12 +185,13 @@ Schema-driven credential envelope engine
 | `user_delete(schema, id)` | Sugar: delete an envelope. Equivalent to ENVELOPE DELETE. |
 | `user_get(schema, id)` | Sugar: get an envelope. Equivalent to ENVELOPE GET. |
 | `user_import(schema, id, json)` | Sugar: import an envelope with pre-hashed credentials. Equivalent to ENVELOPE IMPORT. |
+| `user_lookup(schema, field, value)` | Sugar: look up by indexed or searchable field value. Equivalent to ENVELOPE LOOKUP. |
 | `user_update(schema, id, json)` | Sugar: update non-credential fields. Equivalent to ENVELOPE UPDATE. |
 | `user_verify(schema, id, password)` | Sugar: verify credential. Infers the credential field from schema. Equivalent to ENVELOPE VERIFY with implicit field. |
 
 ### `db.veil`
 
-veil
+Searchable encryption with blind indexing
 
 | Method | Description |
 |--------|-------------|
@@ -210,7 +213,7 @@ veil
 
 ### `db.sentry`
 
-sentry
+Policy-based authorization engine
 
 | Method | Description |
 |--------|-------------|
@@ -235,17 +238,22 @@ Internal certificate authority engine
 
 | Method | Description |
 |--------|-------------|
+| `auth(token)` | Authenticate this connection with a token |
 | `ca_create(name, algorithm, subject, **kwargs)` | Create a new Certificate Authority |
 | `ca_export(name)` | Export the active CA certificate (PEM) |
 | `ca_info(name)` | Get CA metadata and key version status |
 | `ca_list()` | List all Certificate Authorities |
 | `ca_rotate(name, **kwargs)` | Rotate CA signing key |
+| `command()` | List supported commands |
 | `config_get(key)` | Get a runtime configuration value |
 | `config_set(key, value)` | Set a runtime configuration value (only scheduler_interval_secs is mutable) |
+| `health()` | Health check |
 | `inspect(ca, serial)` | Get certificate details |
 | `issue(ca, subject, profile, **kwargs)` | Issue a new certificate. Returns cert + private key (private key never stored). |
 | `issue_from_csr(ca, csr_pem, profile, **kwargs)` | Issue a certificate from a PEM-encoded CSR |
 | `list_certs(ca, **kwargs)` | List certificates for a CA |
+| `ping()` | Liveness probe. Returns PONG. |
+| `regenerate_crl(ca)` | Force regeneration of the CRL for a CA. Also accepted as `CA REGENERATE_CRL <name>`. |
 | `renew(ca, serial, **kwargs)` | Renew a certificate (re-issue with same profile and SANs) |
 | `revoke(ca, serial, **kwargs)` | Revoke a certificate |
 
@@ -313,6 +321,7 @@ Encrypted blob storage with S3 backend and envelope encryption
 
 | Method | Description |
 |--------|-------------|
+| `auth(token)` | Authenticate this connection with a token |
 | `command()` | List supported commands |
 | `fingerprint(id, viewer_id, **kwargs)` | Create a viewer-specific encrypted copy of a blob for leak tracing |
 | `health()` | Health check |

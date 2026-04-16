@@ -17,6 +17,13 @@ class SigilNamespace:
         self._transport = transport
         self._engine = engine
 
+    async def auth(self, token: str) -> _types.SigilAuthResponse:
+        """AUTH — Authenticate the current TCP connection with a bearer token. Handled at the connection layer, not dispatched to the engine. HTTP transport uses the Authorization: Bearer header instead."""
+        args: list[str] = ["AUTH"]
+        args.append(str(token))
+        result = await self._transport.execute(self._engine, args)
+        return _types.SigilAuthResponse(status=result.get("status", ""))
+
     async def credential_change(self, schema: str, id_: str, field: str, old: str, new: str) -> _types.SigilCredentialChangeResponse:
         """CREDENTIAL CHANGE — Change a credential field (requires old value for verification)"""
         args: list[str] = ["CREDENTIAL", "CHANGE"]
@@ -39,7 +46,7 @@ class SigilNamespace:
             args.append("META")
             args.append(meta if isinstance(meta, str) else json.dumps(meta))
         result = await self._transport.execute(self._engine, args)
-        return _types.SigilCredentialImportResponse(algorithm=result.get("algorithm", ""))
+        return _types.SigilCredentialImportResponse(algorithm=result.get("algorithm", ""), status=result.get("status", ""))
 
     async def credential_reset(self, schema: str, id_: str, field: str, new: str) -> _types.SigilCredentialResetResponse:
         """CREDENTIAL RESET — Force-reset a credential field without requiring old value (admin/reset token)"""
@@ -60,8 +67,9 @@ class SigilNamespace:
         result = await self._transport.execute(self._engine, args)
         return _types.SigilEnvelopeCreateResponse(
             created_at=result.get("created_at", 0),
+            entity_id=result.get("entity_id", ""),
             fields=result.get("fields", None),
-            id=result.get("id", ""),
+            status=result.get("status", ""),
         )
 
     async def envelope_delete(self, schema: str, id_: str) -> _types.SigilEnvelopeDeleteResponse:
@@ -80,8 +88,8 @@ class SigilNamespace:
         result = await self._transport.execute(self._engine, args)
         return _types.SigilEnvelopeGetResponse(
             created_at=result.get("created_at", 0),
+            entity_id=result.get("entity_id", ""),
             fields=result.get("fields", None),
-            id=result.get("id", ""),
             updated_at=result.get("updated_at", 0),
         )
 
@@ -94,23 +102,19 @@ class SigilNamespace:
         result = await self._transport.execute(self._engine, args)
         return _types.SigilEnvelopeImportResponse(
             created_at=result.get("created_at", 0),
+            entity_id=result.get("entity_id", ""),
             fields=result.get("fields", None),
-            id=result.get("id", ""),
+            status=result.get("status", ""),
         )
 
     async def envelope_lookup(self, schema: str, field: str, value: str) -> _types.SigilEnvelopeLookupResponse:
-        """ENVELOPE LOOKUP — Look up an envelope by indexed or searchable field value"""
+        """ENVELOPE LOOKUP — Look up an envelope by indexed or searchable field value. Returns the matched entity ID only."""
         args: list[str] = ["ENVELOPE", "LOOKUP"]
         args.append(str(schema))
         args.append(str(field))
         args.append(str(value))
         result = await self._transport.execute(self._engine, args)
-        return _types.SigilEnvelopeLookupResponse(
-            created_at=result.get("created_at", 0),
-            fields=result.get("fields", None),
-            id=result.get("id", ""),
-            updated_at=result.get("updated_at", 0),
-        )
+        return _types.SigilEnvelopeLookupResponse(entity_id=result.get("entity_id", ""), status=result.get("status", ""))
 
     async def envelope_update(self, schema: str, id_: str, json_data: dict[str, Any]) -> _types.SigilEnvelopeUpdateResponse:
         """ENVELOPE UPDATE — Update non-credential fields on an existing envelope"""
@@ -120,8 +124,9 @@ class SigilNamespace:
         args.append(json_data if isinstance(json_data, str) else json.dumps(json_data))
         result = await self._transport.execute(self._engine, args)
         return _types.SigilEnvelopeUpdateResponse(
+            entity_id=result.get("entity_id", ""),
             fields=result.get("fields", None),
-            id=result.get("id", ""),
+            status=result.get("status", ""),
             updated_at=result.get("updated_at", 0),
         )
 
@@ -133,7 +138,7 @@ class SigilNamespace:
         args.append(str(field))
         args.append(str(value))
         result = await self._transport.execute(self._engine, args)
-        return _types.SigilEnvelopeVerifyResponse(valid=result.get("valid", False))
+        return _types.SigilEnvelopeVerifyResponse(status=result.get("status", ""), valid=result.get("valid", False))
 
     async def health(self) -> _types.SigilHealthResponse:
         """HEALTH — Health check"""
@@ -141,12 +146,12 @@ class SigilNamespace:
         result = await self._transport.execute(self._engine, args)
         return _types.SigilHealthResponse(status=result.get("status", ""))
 
-    async def jwks(self, schema: str) -> _types.SigilJwksResponse:
+    async def jwks(self, schema: str) -> dict[str, Any]:
         """JWKS — Get the JSON Web Key Set for external token verification"""
         args: list[str] = ["JWKS"]
         args.append(str(schema))
         result = await self._transport.execute(self._engine, args)
-        return _types.SigilJwksResponse(keys=result.get("keys", None))
+        return result
 
     async def password_change(self, schema: str, id_: str, old: str, new: str) -> _types.SigilPasswordChangeResponse:
         """PASSWORD CHANGE — Sugar: change password. Infers credential field from schema. Equivalent to CREDENTIAL CHANGE with implicit field."""
@@ -168,7 +173,7 @@ class SigilNamespace:
             args.append("META")
             args.append(meta if isinstance(meta, str) else json.dumps(meta))
         result = await self._transport.execute(self._engine, args)
-        return _types.SigilPasswordImportResponse(algorithm=result.get("algorithm", ""))
+        return _types.SigilPasswordImportResponse(algorithm=result.get("algorithm", ""), status=result.get("status", ""))
 
     async def password_reset(self, schema: str, id_: str, new: str) -> _types.SigilPasswordResetResponse:
         """PASSWORD RESET — Sugar: force-reset password. Infers credential field from schema. Equivalent to CREDENTIAL RESET with implicit field."""
@@ -195,21 +200,22 @@ class SigilNamespace:
         return _types.SigilSchemaAlterResponse(
             fields=result.get("fields", 0),
             name=result.get("name", ""),
+            status=result.get("status", ""),
             version=result.get("version", 0),
         )
 
-    async def schema_get(self, name: str) -> _types.SigilSchemaGetResponse:
+    async def schema_get(self, name: str) -> dict[str, Any]:
         """SCHEMA GET — Get a schema definition by name"""
         args: list[str] = ["SCHEMA", "GET"]
         args.append(str(name))
         result = await self._transport.execute(self._engine, args)
-        return _types.SigilSchemaGetResponse(schema=result.get("schema", None))
+        return result
 
-    async def schema_list(self) -> _types.SigilSchemaListResponse:
+    async def schema_list(self) -> dict[str, Any]:
         """SCHEMA LIST — List all registered schema names"""
         args: list[str] = ["SCHEMA", "LIST"]
         result = await self._transport.execute(self._engine, args)
-        return _types.SigilSchemaListResponse(names=result.get("names", None))
+        return result
 
     async def schema_register(self, name: str, json_data: dict[str, Any]) -> _types.SigilSchemaRegisterResponse:
         """SCHEMA REGISTER — Register a credential envelope schema"""
@@ -217,7 +223,7 @@ class SigilNamespace:
         args.append(str(name))
         args.append(json_data if isinstance(json_data, str) else json.dumps(json_data))
         result = await self._transport.execute(self._engine, args)
-        return _types.SigilSchemaRegisterResponse(version=result.get("version", 0))
+        return _types.SigilSchemaRegisterResponse(status=result.get("status", ""), version=result.get("version", 0))
 
     async def session_create(self, schema: str, id_: str, password: str, meta: dict[str, Any] | None = None) -> _types.SigilSessionCreateResponse:
         """SESSION CREATE — Verify credentials and issue access + refresh tokens. Fields annotated with claim=true are auto-included in the JWT from the entity's envelope. Enriched claim values override caller-provided META for the same key."""
@@ -233,15 +239,34 @@ class SigilNamespace:
             access_token=result.get("access_token", ""),
             expires_in=result.get("expires_in", 0),
             refresh_token=result.get("refresh_token", ""),
+            status=result.get("status", ""),
         )
 
-    async def session_list(self, schema: str, id_: str) -> _types.SigilSessionListResponse:
+    async def session_list(self, schema: str, id_: str) -> dict[str, Any]:
         """SESSION LIST — List active sessions for an entity"""
         args: list[str] = ["SESSION", "LIST"]
         args.append(str(schema))
         args.append(str(id_))
         result = await self._transport.execute(self._engine, args)
-        return _types.SigilSessionListResponse(sessions=result.get("sessions", None))
+        return result
+
+    async def session_login(self, schema: str, field: str, value: str, password: str, meta: dict[str, Any] | None = None) -> _types.SigilSessionLoginResponse:
+        """SESSION LOGIN — Verify credentials by indexed field value (e.g., email) and issue access + refresh tokens. Same claim enrichment as SESSION CREATE."""
+        args: list[str] = ["SESSION", "LOGIN"]
+        args.append(str(schema))
+        args.append(str(field))
+        args.append(str(value))
+        args.append(str(password))
+        if meta is not None:
+            args.append("META")
+            args.append(meta if isinstance(meta, str) else json.dumps(meta))
+        result = await self._transport.execute(self._engine, args)
+        return _types.SigilSessionLoginResponse(
+            access_token=result.get("access_token", ""),
+            expires_in=result.get("expires_in", 0),
+            refresh_token=result.get("refresh_token", ""),
+            status=result.get("status", ""),
+        )
 
     async def session_refresh(self, schema: str, token: str) -> _types.SigilSessionRefreshResponse:
         """SESSION REFRESH — Rotate refresh token and issue new access token. Fields annotated with claim=true are re-read from the entity's current envelope, so refreshed tokens reflect the latest values (e.g. role changes)."""
@@ -253,6 +278,7 @@ class SigilNamespace:
             access_token=result.get("access_token", ""),
             expires_in=result.get("expires_in", 0),
             refresh_token=result.get("refresh_token", ""),
+            status=result.get("status", ""),
         )
 
     async def session_revoke(self, schema: str, token: str) -> _types.SigilSessionRevokeResponse:
@@ -269,7 +295,7 @@ class SigilNamespace:
         args.append(str(schema))
         args.append(str(id_))
         result = await self._transport.execute(self._engine, args)
-        return _types.SigilSessionRevokeAllResponse(revoked=result.get("revoked", 0))
+        return _types.SigilSessionRevokeAllResponse(revoked=result.get("revoked", 0), status=result.get("status", ""))
 
     async def user_create(self, schema: str, id_: str, json_data: dict[str, Any]) -> _types.SigilUserCreateResponse:
         """USER CREATE — Sugar: create an envelope. Equivalent to ENVELOPE CREATE."""
@@ -280,8 +306,9 @@ class SigilNamespace:
         result = await self._transport.execute(self._engine, args)
         return _types.SigilUserCreateResponse(
             created_at=result.get("created_at", 0),
+            entity_id=result.get("entity_id", ""),
             fields=result.get("fields", None),
-            user_id=result.get("user_id", ""),
+            status=result.get("status", ""),
         )
 
     async def user_delete(self, schema: str, id_: str) -> _types.SigilUserDeleteResponse:
@@ -300,9 +327,9 @@ class SigilNamespace:
         result = await self._transport.execute(self._engine, args)
         return _types.SigilUserGetResponse(
             created_at=result.get("created_at", 0),
+            entity_id=result.get("entity_id", ""),
             fields=result.get("fields", None),
             updated_at=result.get("updated_at", 0),
-            user_id=result.get("user_id", ""),
         )
 
     async def user_import(self, schema: str, id_: str, json_data: dict[str, Any]) -> _types.SigilUserImportResponse:
@@ -314,9 +341,19 @@ class SigilNamespace:
         result = await self._transport.execute(self._engine, args)
         return _types.SigilUserImportResponse(
             created_at=result.get("created_at", 0),
+            entity_id=result.get("entity_id", ""),
             fields=result.get("fields", None),
-            user_id=result.get("user_id", ""),
+            status=result.get("status", ""),
         )
+
+    async def user_lookup(self, schema: str, field: str, value: str) -> _types.SigilUserLookupResponse:
+        """USER LOOKUP — Sugar: look up by indexed or searchable field value. Equivalent to ENVELOPE LOOKUP."""
+        args: list[str] = ["USER", "LOOKUP"]
+        args.append(str(schema))
+        args.append(str(field))
+        args.append(str(value))
+        result = await self._transport.execute(self._engine, args)
+        return _types.SigilUserLookupResponse(entity_id=result.get("entity_id", ""), status=result.get("status", ""))
 
     async def user_update(self, schema: str, id_: str, json_data: dict[str, Any]) -> _types.SigilUserUpdateResponse:
         """USER UPDATE — Sugar: update non-credential fields. Equivalent to ENVELOPE UPDATE."""
@@ -326,9 +363,10 @@ class SigilNamespace:
         args.append(json_data if isinstance(json_data, str) else json.dumps(json_data))
         result = await self._transport.execute(self._engine, args)
         return _types.SigilUserUpdateResponse(
+            entity_id=result.get("entity_id", ""),
             fields=result.get("fields", None),
+            status=result.get("status", ""),
             updated_at=result.get("updated_at", 0),
-            user_id=result.get("user_id", ""),
         )
 
     async def user_verify(self, schema: str, id_: str, password: str) -> _types.SigilUserVerifyResponse:
@@ -338,4 +376,4 @@ class SigilNamespace:
         args.append(str(id_))
         args.append(str(password))
         result = await self._transport.execute(self._engine, args)
-        return _types.SigilUserVerifyResponse(valid=result.get("valid", False))
+        return _types.SigilUserVerifyResponse(status=result.get("status", ""), valid=result.get("valid", False))

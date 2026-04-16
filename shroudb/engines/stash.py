@@ -17,6 +17,13 @@ class StashNamespace:
         self._transport = transport
         self._engine = engine
 
+    async def auth(self, token: str) -> dict[str, Any]:
+        """AUTH — Authenticate this connection with a token"""
+        args: list[str] = ["AUTH"]
+        args.append(str(token))
+        result = await self._transport.execute(self._engine, args)
+        return result
+
     async def command(self) -> dict[str, Any]:
         """COMMAND — List supported commands"""
         args: list[str] = ["COMMAND"]

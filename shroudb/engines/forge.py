@@ -17,6 +17,13 @@ class ForgeNamespace:
         self._transport = transport
         self._engine = engine
 
+    async def auth(self, token: str) -> _types.ForgeAuthResponse:
+        """AUTH — Authenticate this connection with a token"""
+        args: list[str] = ["AUTH"]
+        args.append(str(token))
+        result = await self._transport.execute(self._engine, args)
+        return _types.ForgeAuthResponse(status=result.get("status", ""))
+
     async def ca_create(self, name: str, algorithm: str, subject: str, ttl_days: int | None = None, parent: str | None = None) -> _types.ForgeCaCreateResponse:
         """CA CREATE — Create a new Certificate Authority"""
         args: list[str] = ["CA", "CREATE"]
@@ -78,6 +85,12 @@ class ForgeNamespace:
             rotated=result.get("rotated", False),
         )
 
+    async def command(self) -> _types.ForgeCommandResponse:
+        """COMMAND — List supported commands"""
+        args: list[str] = ["COMMAND"]
+        result = await self._transport.execute(self._engine, args)
+        return _types.ForgeCommandResponse(commands=result.get("commands", None))
+
     async def config_get(self, key: str) -> _types.ForgeConfigGetResponse:
         """CONFIG GET — Get a runtime configuration value"""
         args: list[str] = ["CONFIG", "GET"]
@@ -100,6 +113,12 @@ class ForgeNamespace:
             status=result.get("status", ""),
             value=result.get("value", ""),
         )
+
+    async def health(self) -> _types.ForgeHealthResponse:
+        """HEALTH — Health check"""
+        args: list[str] = ["HEALTH"]
+        result = await self._transport.execute(self._engine, args)
+        return _types.ForgeHealthResponse(status=result.get("status", ""))
 
     async def inspect(self, ca: str, serial: str) -> _types.ForgeInspectResponse:
         """INSPECT — Get certificate details"""
@@ -163,6 +182,19 @@ class ForgeNamespace:
             args.append(str(offset))
         result = await self._transport.execute(self._engine, args)
         return _types.ForgeListCertsResponse(certs=result.get("certs", None), count=result.get("count", 0))
+
+    async def ping(self) -> _types.ForgePingResponse:
+        """PING — Liveness probe. Returns PONG."""
+        args: list[str] = ["PING"]
+        result = await self._transport.execute(self._engine, args)
+        return _types.ForgePingResponse(status=result.get("status", ""))
+
+    async def regenerate_crl(self, ca: str) -> _types.ForgeRegenerateCrlResponse:
+        """REGENERATE_CRL — Force regeneration of the CRL for a CA. Also accepted as `CA REGENERATE_CRL <name>`."""
+        args: list[str] = ["REGENERATE_CRL"]
+        args.append(str(ca))
+        result = await self._transport.execute(self._engine, args)
+        return _types.ForgeRegenerateCrlResponse(status=result.get("status", ""))
 
     async def renew(self, ca: str, serial: str, ttl: str | None = None) -> _types.ForgeRenewResponse:
         """RENEW — Renew a certificate (re-issue with same profile and SANs)"""

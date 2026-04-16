@@ -152,6 +152,9 @@ class ErrorCode:
     STORAGE: str = "STORAGE"
     """Backend storage error"""
 
+    STORE: str = "STORE"
+    """ShrouDB Store (metadata) operation failed"""
+
     TOKEN_REUSE: str = "TOKEN_REUSE"
     """Refresh token reuse detected — entire family revoked"""
 

@@ -11,7 +11,7 @@ from ..types import sentry as _types
 
 
 class SentryNamespace:
-    """Sentry — sentry"""
+    """Sentry — Policy-based authorization engine"""
 
     def __init__(self, transport: Transport, engine: str = "sentry") -> None:
         self._transport = transport

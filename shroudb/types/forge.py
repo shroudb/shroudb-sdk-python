@@ -7,6 +7,12 @@ from typing import Any
 
 
 @dataclass(frozen=True)
+class ForgeAuthResponse:
+    """Response from ``forge.AUTH()``."""
+
+    status: str
+
+@dataclass(frozen=True)
 class ForgeCaCreateResponse:
     """Response from ``forge.CA_CREATE()``."""
 
@@ -45,6 +51,12 @@ class ForgeCaRotateResponse:
     rotated: bool
 
 @dataclass(frozen=True)
+class ForgeCommandResponse:
+    """Response from ``forge.COMMAND()``."""
+
+    commands: list[Any]
+
+@dataclass(frozen=True)
 class ForgeConfigGetResponse:
     """Response from ``forge.CONFIG_GET()``."""
 
@@ -59,6 +71,12 @@ class ForgeConfigSetResponse:
     key: str
     status: str
     value: str
+
+@dataclass(frozen=True)
+class ForgeHealthResponse:
+    """Response from ``forge.HEALTH()``."""
+
+    status: str
 
 @dataclass(frozen=True)
 class ForgeInspectResponse:
@@ -90,6 +108,18 @@ class ForgeListCertsResponse:
 
     certs: list[Any]
     count: int
+
+@dataclass(frozen=True)
+class ForgePingResponse:
+    """Response from ``forge.PING()``."""
+
+    status: str
+
+@dataclass(frozen=True)
+class ForgeRegenerateCrlResponse:
+    """Response from ``forge.REGENERATE_CRL()``."""
+
+    status: str
 
 @dataclass(frozen=True)
 class ForgeRenewResponse:

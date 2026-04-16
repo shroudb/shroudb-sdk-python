@@ -7,6 +7,12 @@ from typing import Any
 
 
 @dataclass(frozen=True)
+class SigilAuthResponse:
+    """Response from ``sigil.AUTH()``."""
+
+    status: str
+
+@dataclass(frozen=True)
 class SigilCredentialChangeResponse:
     """Response from ``sigil.CREDENTIAL_CHANGE()``."""
 
@@ -17,6 +23,7 @@ class SigilCredentialImportResponse:
     """Response from ``sigil.CREDENTIAL_IMPORT()``."""
 
     algorithm: str
+    status: str
 
 @dataclass(frozen=True)
 class SigilCredentialResetResponse:
@@ -29,8 +36,9 @@ class SigilEnvelopeCreateResponse:
     """Response from ``sigil.ENVELOPE_CREATE()``."""
 
     created_at: int
+    entity_id: str
     fields: dict[str, Any]
-    id: str
+    status: str
 
 @dataclass(frozen=True)
 class SigilEnvelopeDeleteResponse:
@@ -43,8 +51,8 @@ class SigilEnvelopeGetResponse:
     """Response from ``sigil.ENVELOPE_GET()``."""
 
     created_at: int
+    entity_id: str
     fields: dict[str, Any]
-    id: str
     updated_at: int
 
 @dataclass(frozen=True)
@@ -52,30 +60,31 @@ class SigilEnvelopeImportResponse:
     """Response from ``sigil.ENVELOPE_IMPORT()``."""
 
     created_at: int
+    entity_id: str
     fields: dict[str, Any]
-    id: str
+    status: str
 
 @dataclass(frozen=True)
 class SigilEnvelopeLookupResponse:
     """Response from ``sigil.ENVELOPE_LOOKUP()``."""
 
-    created_at: int
-    fields: dict[str, Any]
-    id: str
-    updated_at: int
+    entity_id: str
+    status: str
 
 @dataclass(frozen=True)
 class SigilEnvelopeUpdateResponse:
     """Response from ``sigil.ENVELOPE_UPDATE()``."""
 
+    entity_id: str
     fields: dict[str, Any]
-    id: str
+    status: str
     updated_at: int
 
 @dataclass(frozen=True)
 class SigilEnvelopeVerifyResponse:
     """Response from ``sigil.ENVELOPE_VERIFY()``."""
 
+    status: str
     valid: bool
 
 @dataclass(frozen=True)
@@ -83,12 +92,6 @@ class SigilHealthResponse:
     """Response from ``sigil.HEALTH()``."""
 
     status: str
-
-@dataclass(frozen=True)
-class SigilJwksResponse:
-    """Response from ``sigil.JWKS()``."""
-
-    keys: list[Any]
 
 @dataclass(frozen=True)
 class SigilPasswordChangeResponse:
@@ -101,6 +104,7 @@ class SigilPasswordImportResponse:
     """Response from ``sigil.PASSWORD_IMPORT()``."""
 
     algorithm: str
+    status: str
 
 @dataclass(frozen=True)
 class SigilPasswordResetResponse:
@@ -114,24 +118,14 @@ class SigilSchemaAlterResponse:
 
     fields: int
     name: str
+    status: str
     version: int
-
-@dataclass(frozen=True)
-class SigilSchemaGetResponse:
-    """Response from ``sigil.SCHEMA_GET()``."""
-
-    schema: str
-
-@dataclass(frozen=True)
-class SigilSchemaListResponse:
-    """Response from ``sigil.SCHEMA_LIST()``."""
-
-    names: list[Any]
 
 @dataclass(frozen=True)
 class SigilSchemaRegisterResponse:
     """Response from ``sigil.SCHEMA_REGISTER()``."""
 
+    status: str
     version: int
 
 @dataclass(frozen=True)
@@ -141,12 +135,16 @@ class SigilSessionCreateResponse:
     access_token: str
     expires_in: int
     refresh_token: str
+    status: str
 
 @dataclass(frozen=True)
-class SigilSessionListResponse:
-    """Response from ``sigil.SESSION_LIST()``."""
+class SigilSessionLoginResponse:
+    """Response from ``sigil.SESSION_LOGIN()``."""
 
-    sessions: list[Any]
+    access_token: str
+    expires_in: int
+    refresh_token: str
+    status: str
 
 @dataclass(frozen=True)
 class SigilSessionRefreshResponse:
@@ -155,6 +153,7 @@ class SigilSessionRefreshResponse:
     access_token: str
     expires_in: int
     refresh_token: str
+    status: str
 
 @dataclass(frozen=True)
 class SigilSessionRevokeResponse:
@@ -167,14 +166,16 @@ class SigilSessionRevokeAllResponse:
     """Response from ``sigil.SESSION_REVOKE_ALL()``."""
 
     revoked: int
+    status: str
 
 @dataclass(frozen=True)
 class SigilUserCreateResponse:
     """Response from ``sigil.USER_CREATE()``."""
 
     created_at: int
+    entity_id: str
     fields: dict[str, Any]
-    user_id: str
+    status: str
 
 @dataclass(frozen=True)
 class SigilUserDeleteResponse:
@@ -187,28 +188,38 @@ class SigilUserGetResponse:
     """Response from ``sigil.USER_GET()``."""
 
     created_at: int
+    entity_id: str
     fields: dict[str, Any]
     updated_at: int
-    user_id: str
 
 @dataclass(frozen=True)
 class SigilUserImportResponse:
     """Response from ``sigil.USER_IMPORT()``."""
 
     created_at: int
+    entity_id: str
     fields: dict[str, Any]
-    user_id: str
+    status: str
+
+@dataclass(frozen=True)
+class SigilUserLookupResponse:
+    """Response from ``sigil.USER_LOOKUP()``."""
+
+    entity_id: str
+    status: str
 
 @dataclass(frozen=True)
 class SigilUserUpdateResponse:
     """Response from ``sigil.USER_UPDATE()``."""
 
+    entity_id: str
     fields: dict[str, Any]
+    status: str
     updated_at: int
-    user_id: str
 
 @dataclass(frozen=True)
 class SigilUserVerifyResponse:
     """Response from ``sigil.USER_VERIFY()``."""
 
+    status: str
     valid: bool

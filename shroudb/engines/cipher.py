@@ -39,7 +39,7 @@ class CipherNamespace:
             args.append("CONTEXT")
             args.append(str(context))
         result = await self._transport.execute(self._engine, args)
-        return _types.CipherDecryptResponse(plaintext=result.get("plaintext", ""))
+        return _types.CipherDecryptResponse(status=result.get("status", ""), plaintext=result.get("plaintext", ""))
 
     async def encrypt(self, keyring: str, plaintext: str | bytes, context: str | None = None, key_version: int | None = None, convergent: bool = False) -> _types.CipherEncryptResponse:
         """ENCRYPT — Encrypt plaintext with the active key version"""
@@ -55,7 +55,11 @@ class CipherNamespace:
         if convergent:
             args.append("CONVERGENT")
         result = await self._transport.execute(self._engine, args)
-        return _types.CipherEncryptResponse(ciphertext=result.get("ciphertext", ""), key_version=result.get("key_version", 0))
+        return _types.CipherEncryptResponse(
+            status=result.get("status", ""),
+            ciphertext=result.get("ciphertext", ""),
+            key_version=result.get("key_version", 0),
+        )
 
     async def generate_data_key(self, keyring: str, bits: int | None = None) -> _types.CipherGenerateDataKeyResponse:
         """GENERATE_DATA_KEY — Generate a data encryption key (envelope encryption pattern)"""
@@ -66,6 +70,7 @@ class CipherNamespace:
             args.append(str(bits))
         result = await self._transport.execute(self._engine, args)
         return _types.CipherGenerateDataKeyResponse(
+            status=result.get("status", ""),
             plaintext_key=result.get("plaintext_key", ""),
             wrapped_key=result.get("wrapped_key", ""),
             key_version=result.get("key_version", 0),
@@ -104,6 +109,7 @@ class CipherNamespace:
             args.append("CONVERGENT")
         result = await self._transport.execute(self._engine, args)
         return _types.CipherKeyringCreateResponse(
+            status=result.get("status", ""),
             keyring=result.get("keyring", ""),
             algorithm=result.get("algorithm", None),
             active_version=result.get("active_version", 0),
@@ -119,7 +125,7 @@ class CipherNamespace:
         """PING — Simple connectivity check — returns PONG"""
         args: list[str] = ["PING"]
         result = await self._transport.execute(self._engine, args)
-        return _types.CipherPingResponse(message=result.get("message", ""))
+        return _types.CipherPingResponse(pong=result.get("pong", ""))
 
     async def rewrap(self, keyring: str, ciphertext: str, context: str | None = None) -> _types.CipherRewrapResponse:
         """REWRAP — Re-encrypt ciphertext with the current active key version"""
@@ -130,7 +136,11 @@ class CipherNamespace:
             args.append("CONTEXT")
             args.append(str(context))
         result = await self._transport.execute(self._engine, args)
-        return _types.CipherRewrapResponse(ciphertext=result.get("ciphertext", ""), key_version=result.get("key_version", 0))
+        return _types.CipherRewrapResponse(
+            status=result.get("status", ""),
+            ciphertext=result.get("ciphertext", ""),
+            key_version=result.get("key_version", 0),
+        )
 
     async def rotate(self, keyring: str, force: bool = False, dryrun: bool = False) -> _types.CipherRotateResponse:
         """ROTATE — Rotate the keyring to a new key version"""
@@ -142,6 +152,7 @@ class CipherNamespace:
             args.append("DRYRUN")
         result = await self._transport.execute(self._engine, args)
         return _types.CipherRotateResponse(
+            status=result.get("status", ""),
             rotated=result.get("rotated", False),
             key_version=result.get("key_version", 0),
             previous_version=result.get("previous_version"),
@@ -153,7 +164,11 @@ class CipherNamespace:
         args.append(str(keyring))
         args.append(data if isinstance(data, str) else base64.b64encode(data).decode())
         result = await self._transport.execute(self._engine, args)
-        return _types.CipherSignResponse(signature=result.get("signature", ""), key_version=result.get("key_version", 0))
+        return _types.CipherSignResponse(
+            status=result.get("status", ""),
+            signature=result.get("signature", ""),
+            key_version=result.get("key_version", 0),
+        )
 
     async def verify_signature(self, keyring: str, data: str | bytes, signature: str) -> _types.CipherVerifySignatureResponse:
         """VERIFY_SIGNATURE — Verify a detached signature"""
@@ -162,4 +177,4 @@ class CipherNamespace:
         args.append(data if isinstance(data, str) else base64.b64encode(data).decode())
         args.append(str(signature))
         result = await self._transport.execute(self._engine, args)
-        return _types.CipherVerifySignatureResponse(valid=result.get("valid", False))
+        return _types.CipherVerifySignatureResponse(status=result.get("status", ""), valid=result.get("valid", False))

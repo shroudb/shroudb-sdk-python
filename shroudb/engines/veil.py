@@ -11,7 +11,7 @@ from ..types import veil as _types
 
 
 class VeilNamespace:
-    """Veil — veil"""
+    """Veil — Searchable encryption with blind indexing"""
 
     def __init__(self, transport: Transport, engine: str = "veil") -> None:
         self._transport = transport

@@ -26,6 +26,8 @@ class CipherCommandListResponse:
 class CipherDecryptResponse:
     """Response from ``cipher.decrypt()``."""
 
+    # ok
+    status: str
     # Decrypted data
     plaintext: str
 
@@ -33,6 +35,8 @@ class CipherDecryptResponse:
 class CipherEncryptResponse:
     """Response from ``cipher.encrypt()``."""
 
+    # ok
+    status: str
     # Encrypted data with embedded key version
     ciphertext: str
     # Key version used for encryption
@@ -42,6 +46,8 @@ class CipherEncryptResponse:
 class CipherGenerateDataKeyResponse:
     """Response from ``cipher.generate_data_key()``."""
 
+    # ok
+    status: str
     # Plaintext DEK (use for local encryption, then discard)
     plaintext_key: str
     # Wrapped DEK (store alongside ciphertext, unwrap via DECRYPT)
@@ -73,6 +79,8 @@ class CipherKeyInfoResponse:
 class CipherKeyringCreateResponse:
     """Response from ``cipher.keyring_create()``."""
 
+    # ok
+    status: str
     # Keyring name
     keyring: str
     # Algorithm
@@ -84,20 +92,22 @@ class CipherKeyringCreateResponse:
 class CipherKeyringListResponse:
     """Response from ``cipher.keyring_list()``."""
 
-    # List of keyring names
+    # Bare JSON array of keyring name strings
     keyrings: list[Any]
 
 @dataclass(frozen=True)
 class CipherPingResponse:
     """Response from ``cipher.ping()``."""
 
-    # Always PONG
-    message: str
+    # Always the bare string "PONG" (not wrapped in an object)
+    pong: str
 
 @dataclass(frozen=True)
 class CipherRewrapResponse:
     """Response from ``cipher.rewrap()``."""
 
+    # ok
+    status: str
     # Re-encrypted ciphertext with new key version
     ciphertext: str
     # New key version used
@@ -107,6 +117,8 @@ class CipherRewrapResponse:
 class CipherRotateResponse:
     """Response from ``cipher.rotate()``."""
 
+    # ok
+    status: str
     # Whether rotation occurred
     rotated: bool
     # Active key version after operation
@@ -118,6 +130,8 @@ class CipherRotateResponse:
 class CipherSignResponse:
     """Response from ``cipher.sign()``."""
 
+    # ok
+    status: str
     # Hex-encoded detached signature
     signature: str
     # Key version used
@@ -127,5 +141,7 @@ class CipherSignResponse:
 class CipherVerifySignatureResponse:
     """Response from ``cipher.verify_signature()``."""
 
+    # ok
+    status: str
     # Whether the signature is valid
     valid: bool
