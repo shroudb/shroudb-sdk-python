@@ -113,6 +113,12 @@ class SigilPasswordResetResponse:
     status: str
 
 @dataclass(frozen=True)
+class SigilPingResponse:
+    """Response from ``sigil.PING()``."""
+
+    status: str
+
+@dataclass(frozen=True)
 class SigilSchemaAlterResponse:
     """Response from ``sigil.SCHEMA_ALTER()``."""
 

@@ -184,6 +184,12 @@ class SigilNamespace:
         result = await self._transport.execute(self._engine, args)
         return _types.SigilPasswordResetResponse(status=result.get("status", ""))
 
+    async def ping(self) -> _types.SigilPingResponse:
+        """PING — Ping-pong connectivity test"""
+        args: list[str] = ["PING"]
+        result = await self._transport.execute(self._engine, args)
+        return _types.SigilPingResponse(status=result.get("status", ""))
+
     async def schema_alter(self, name: str, action: str, field_json: dict[str, Any] | None = None, field_name: str | None = None) -> _types.SigilSchemaAlterResponse:
         """SCHEMA ALTER — Add or remove fields from a schema, producing a new version. Added fields are optional (required=false). Existing envelopes remain readable."""
         args: list[str] = ["SCHEMA", "ALTER"]
