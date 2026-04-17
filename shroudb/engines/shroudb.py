@@ -174,12 +174,13 @@ class ShroudbNamespace:
         result = await self._transport.execute(self._engine, args)
         return _types.ShroudbPingResponse(message=result.get("message", ""))
 
-    async def pipeline(self, count: int) -> dict[str, Any]:
+    async def pipeline(
+        self,
+        commands: list[list[str]],
+        request_id: str | None = None,
+    ) -> list[dict[str, Any]]:
         """PIPELINE — Execute commands atomically (all succeed or all roll back)"""
-        args: list[str] = ["PIPELINE"]
-        args.append(str(count))
-        result = await self._transport.execute(self._engine, args)
-        return result
+        return await self._transport.execute_pipeline(self._engine, commands, request_id)
 
     async def put(self, namespace: str, key: str, value: str | None = None, meta: dict[str, Any] | None = None) -> _types.ShroudbPutResponse:
         """PUT — Store a value at the given key. Auto-increments version."""

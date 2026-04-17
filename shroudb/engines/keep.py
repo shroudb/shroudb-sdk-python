@@ -58,6 +58,22 @@ class KeepNamespace:
             created_by=result.get("created_by", ""),
         )
 
+    async def get_many(
+        self,
+        calls: list[dict[str, Any]],
+    ) -> list[_types.KeepGetResponse]:
+        """GET — batch variant: pipelines N independent calls over one connection (ordered, not atomic)."""
+        args_list: list[list[str]] = []
+        for call in calls:
+            args: list[str] = ["GET"]
+            args.append(str(call["path"]))
+            if "version" in call:
+                args.append("VERSION")
+                args.append(str(call["version"]))
+            args_list.append(args)
+        results = await self._transport.execute_many(self._engine, args_list)
+        return [_types.KeepGetResponse(status=r.get("status", ""), path=r.get("path", None), version=r.get("version", None), value=r.get("value", None), created_at=r.get("created_at", 0), created_by=r.get("created_by", "")) for r in results]
+
     async def health(self) -> _types.KeepHealthResponse:
         """HEALTH — Health check."""
         args: list[str] = ["HEALTH"]

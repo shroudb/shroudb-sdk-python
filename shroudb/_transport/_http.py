@@ -28,6 +28,27 @@ class HttpTransport(Transport):
         self._token = token
         self._prefixes = prefixes or {}
 
+    async def execute_many(
+        self,
+        engine: str,
+        args_list: list[list[str]],
+    ) -> list[dict[str, Any]]:
+        # HTTP has no pipelining; fall back to sequential requests, returning in order.
+        results: list[dict[str, Any]] = []
+        for args in args_list:
+            results.append(await self.execute(engine, args))
+        return results
+
+    async def execute_pipeline(
+        self,
+        engine: str,
+        commands: list[list[str]],
+        request_id: str | None = None,
+    ) -> list[dict[str, Any]]:
+        raise NotImplementedError(
+            "PIPELINE is a RESP3-only command; use Resp3Transport or MoatResp3Transport"
+        )
+
     async def execute(self, engine: str, args: list[str]) -> dict[str, Any]:
         prefix = self._prefixes.get(engine, f"/v1/{engine}")
         url = f"{self._base_url}{prefix}"

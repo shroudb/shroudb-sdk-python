@@ -58,6 +58,36 @@ class Resp3Connection:
         await self._writer.drain()
         return await self._read_frame()
 
+    async def execute_pipeline_frame(
+        self,
+        prefix: list[str],
+        commands: list[list[str]],
+        request_id: str | None,
+    ) -> WireValue:
+        """Send a server-side PIPELINE frame (nested sub-command arrays)."""
+        # *N\r\n
+        # $<..>\r\n<prefix bulk strings>
+        # [$10\r\nREQUEST_ID\r\n $<len>\r\n<id>\r\n]  (optional)
+        # *M\r\n <sub-command bulk strings> ...       (x N commands)
+        keyword_count = 2 if request_id is not None else 0
+        outer_len = len(prefix) + keyword_count + len(commands)
+        parts: list[str] = [f"*{outer_len}\r\n"]
+        for p in prefix:
+            encoded = p.encode("utf-8")
+            parts.append(f"${len(encoded)}\r\n{p}\r\n")
+        if request_id is not None:
+            parts.append("$10\r\nREQUEST_ID\r\n")
+            id_encoded = request_id.encode("utf-8")
+            parts.append(f"${len(id_encoded)}\r\n{request_id}\r\n")
+        for sub in commands:
+            parts.append(f"*{len(sub)}\r\n")
+            for arg in sub:
+                encoded = arg.encode("utf-8")
+                parts.append(f"${len(encoded)}\r\n{arg}\r\n")
+        self._writer.write("".join(parts).encode("utf-8"))
+        await self._writer.drain()
+        return await self._read_frame()
+
     def close(self) -> None:
         self._writer.close()
 
@@ -274,6 +304,40 @@ class Resp3Transport(Transport):
         finally:
             self._pool.release(conn)
 
+    async def execute_many(
+        self,
+        engine: str,
+        args_list: list[list[str]],
+    ) -> list[dict[str, Any]]:
+        if not args_list:
+            return []
+        conn = await self._pool.acquire()
+        try:
+            results: list[dict[str, Any]] = []
+            for args in args_list:
+                raw = await conn.execute(*args)
+                results.append(_parse_response(raw))
+            return results
+        finally:
+            self._pool.release(conn)
+
+    async def execute_pipeline(
+        self,
+        engine: str,
+        commands: list[list[str]],
+        request_id: str | None = None,
+    ) -> list[dict[str, Any]]:
+        conn = await self._pool.acquire()
+        try:
+            raw = await conn.execute_pipeline_frame(["PIPELINE"], commands, request_id)
+            if not isinstance(raw, list):
+                from ..errors import ShrouDBError
+
+                raise ShrouDBError("ERR", "PIPELINE response was not an array")
+            return [_parse_response(item) for item in raw]
+        finally:
+            self._pool.release(conn)
+
     async def close(self) -> None:
         await self._pool.close()
 
@@ -300,6 +364,43 @@ class MoatResp3Transport(Transport):
         try:
             raw = await conn.execute(*prefixed)
             return _parse_response(raw)
+        finally:
+            self._pool.release(conn)
+
+    async def execute_many(
+        self,
+        engine: str,
+        args_list: list[list[str]],
+    ) -> list[dict[str, Any]]:
+        if not args_list:
+            return []
+        prefix = engine.upper()
+        conn = await self._pool.acquire()
+        try:
+            results: list[dict[str, Any]] = []
+            for args in args_list:
+                raw = await conn.execute(prefix, *args)
+                results.append(_parse_response(raw))
+            return results
+        finally:
+            self._pool.release(conn)
+
+    async def execute_pipeline(
+        self,
+        engine: str,
+        commands: list[list[str]],
+        request_id: str | None = None,
+    ) -> list[dict[str, Any]]:
+        conn = await self._pool.acquire()
+        try:
+            raw = await conn.execute_pipeline_frame(
+                [engine.upper(), "PIPELINE"], commands, request_id
+            )
+            if not isinstance(raw, list):
+                from ..errors import ShrouDBError
+
+                raise ShrouDBError("ERR", "PIPELINE response was not an array")
+            return [_parse_response(item) for item in raw]
         finally:
             self._pool.release(conn)
 

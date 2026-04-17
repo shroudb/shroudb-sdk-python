@@ -14,5 +14,36 @@ class Transport(abc.ABC):
         """Execute a command and return the parsed response."""
 
     @abc.abstractmethod
+    async def execute_many(
+        self,
+        engine: str,
+        args_list: list[list[str]],
+    ) -> list[dict[str, Any]]:
+        """Execute N independent commands in one round-trip.
+
+        Sends each command as a separate RESP3 frame on a single connection and
+        collects N responses in order. Unlike ``execute_pipeline``, this is
+        **not** atomic — each command is independently dispatched, authorized,
+        and audited by the server.
+        """
+
+    @abc.abstractmethod
+    async def execute_pipeline(
+        self,
+        engine: str,
+        commands: list[list[str]],
+        request_id: str | None = None,
+    ) -> list[dict[str, Any]]:
+        """Execute a server-side atomic PIPELINE.
+
+        Sends ``PIPELINE`` with N nested sub-command arrays in a single RESP3
+        frame and returns one result per sub-command, in order. Pass
+        ``request_id`` for idempotent retry — repeated calls with the same ID
+        return the cached result without re-executing.
+
+        Only supported over RESP3; HTTP transports raise ``NotImplementedError``.
+        """
+
+    @abc.abstractmethod
     async def close(self) -> None:
         """Close all connections."""
