@@ -120,6 +120,18 @@ class ForgeNamespace:
         result = await self._transport.execute(self._engine, args)
         return _types.ForgeHealthResponse(status=result.get("status", ""))
 
+    async def hello(self) -> _types.ForgeHelloResponse:
+        """HELLO — Engine identity handshake — returns engine name, version, wire protocol, supported commands, and capability tags. Pre-auth; clients issue this on connect to verify they are talking to the expected engine and version."""
+        args: list[str] = ["HELLO"]
+        result = await self._transport.execute(self._engine, args)
+        return _types.ForgeHelloResponse(
+            capabilities=result.get("capabilities", None),
+            commands=result.get("commands", None),
+            engine=result.get("engine", ""),
+            protocol=result.get("protocol", ""),
+            version=result.get("version", ""),
+        )
+
     async def inspect(self, ca: str, serial: str) -> _types.ForgeInspectResponse:
         """INSPECT — Get certificate details"""
         args: list[str] = ["INSPECT"]

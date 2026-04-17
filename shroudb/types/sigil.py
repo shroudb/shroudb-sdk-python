@@ -94,6 +94,16 @@ class SigilHealthResponse:
     status: str
 
 @dataclass(frozen=True)
+class SigilHelloResponse:
+    """Response from ``sigil.HELLO()``."""
+
+    capabilities: list[Any]
+    commands: list[Any]
+    engine: str
+    protocol: str
+    version: str
+
+@dataclass(frozen=True)
 class SigilPasswordChangeResponse:
     """Response from ``sigil.PASSWORD_CHANGE()``."""
 

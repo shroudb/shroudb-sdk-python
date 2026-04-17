@@ -16,6 +16,16 @@ class StashFingerprintResponse:
     viewer_id: str
 
 @dataclass(frozen=True)
+class StashHelloResponse:
+    """Response from ``stash.hello()``."""
+
+    capabilities: list[Any]
+    commands: list[Any]
+    engine: str
+    protocol: str
+    version: str
+
+@dataclass(frozen=True)
 class StashInspectResponse:
     """Response from ``stash.inspect()``."""
 

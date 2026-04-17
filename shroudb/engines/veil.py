@@ -44,6 +44,18 @@ class VeilNamespace:
         result = await self._transport.execute(self._engine, args)
         return _types.VeilHealthResponse(status=result.get("status", None))
 
+    async def hello(self) -> _types.VeilHelloResponse:
+        """HELLO — Engine identity handshake — returns engine name, version, wire protocol, supported commands, and capability tags. Pre-auth; clients issue this on connect to verify they are talking to the expected engine and version."""
+        args: list[str] = ["HELLO"]
+        result = await self._transport.execute(self._engine, args)
+        return _types.VeilHelloResponse(
+            engine=result.get("engine", None),
+            version=result.get("version", None),
+            protocol=result.get("protocol", None),
+            commands=result.get("commands", None),
+            capabilities=result.get("capabilities", None),
+        )
+
     async def index_create(self, name: str) -> _types.VeilIndexCreateResponse:
         """INDEX CREATE — Create a new blind index with a fresh HMAC key"""
         args: list[str] = ["INDEX", "CREATE"]

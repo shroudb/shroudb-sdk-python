@@ -82,6 +82,18 @@ class CipherNamespace:
         result = await self._transport.execute(self._engine, args)
         return _types.CipherHealthResponse(status=result.get("status", ""))
 
+    async def hello(self) -> _types.CipherHelloResponse:
+        """HELLO — Engine identity handshake — returns engine name, version, wire protocol, supported commands, and capability tags. Pre-auth; clients issue this on connect to verify they are talking to the expected engine and version."""
+        args: list[str] = ["HELLO"]
+        result = await self._transport.execute(self._engine, args)
+        return _types.CipherHelloResponse(
+            engine=result.get("engine", ""),
+            version=result.get("version", ""),
+            protocol=result.get("protocol", ""),
+            commands=result.get("commands", None),
+            capabilities=result.get("capabilities", None),
+        )
+
     async def key_info(self, keyring: str) -> _types.CipherKeyInfoResponse:
         """KEY_INFO — Get keyring metadata and key version information"""
         args: list[str] = ["KEY_INFO"]

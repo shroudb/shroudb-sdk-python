@@ -33,6 +33,16 @@ class VeilHealthResponse:
     status: str
 
 @dataclass(frozen=True)
+class VeilHelloResponse:
+    """Response from ``veil.HELLO()``."""
+
+    engine: str
+    version: str
+    protocol: str
+    commands: str
+    capabilities: str
+
+@dataclass(frozen=True)
 class VeilIndexCreateResponse:
     """Response from ``veil.INDEX_CREATE()``."""
 

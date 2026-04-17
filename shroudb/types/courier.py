@@ -86,6 +86,16 @@ class CourierHealthResponse:
     status: str
 
 @dataclass(frozen=True)
+class CourierHelloResponse:
+    """Response from ``courier.HELLO()``."""
+
+    capabilities: list[Any]
+    commands: list[Any]
+    engine: str
+    protocol: str
+    version: str
+
+@dataclass(frozen=True)
 class CourierMetricsResponse:
     """Response from ``courier.METRICS()``."""
 

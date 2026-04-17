@@ -146,6 +146,18 @@ class SigilNamespace:
         result = await self._transport.execute(self._engine, args)
         return _types.SigilHealthResponse(status=result.get("status", ""))
 
+    async def hello(self) -> _types.SigilHelloResponse:
+        """HELLO — Engine identity handshake — returns engine name, version, wire protocol, supported commands, and capability tags. Pre-auth; clients issue this on connect to verify they are talking to the expected engine and version."""
+        args: list[str] = ["HELLO"]
+        result = await self._transport.execute(self._engine, args)
+        return _types.SigilHelloResponse(
+            capabilities=result.get("capabilities", None),
+            commands=result.get("commands", None),
+            engine=result.get("engine", ""),
+            protocol=result.get("protocol", ""),
+            version=result.get("version", ""),
+        )
+
     async def jwks(self, schema: str) -> dict[str, Any]:
         """JWKS — Get the JSON Web Key Set for external token verification"""
         args: list[str] = ["JWKS"]

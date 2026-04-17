@@ -80,6 +80,18 @@ class KeepNamespace:
         result = await self._transport.execute(self._engine, args)
         return _types.KeepHealthResponse(status=result.get("status", ""))
 
+    async def hello(self) -> _types.KeepHelloResponse:
+        """HELLO — Engine identity handshake — returns engine name, version, wire protocol, supported commands, and capability tags. Pre-auth; clients issue this on connect to verify they are talking to the expected engine and version."""
+        args: list[str] = ["HELLO"]
+        result = await self._transport.execute(self._engine, args)
+        return _types.KeepHelloResponse(
+            engine=result.get("engine", ""),
+            version=result.get("version", ""),
+            protocol=result.get("protocol", ""),
+            commands=result.get("commands", None),
+            capabilities=result.get("capabilities", None),
+        )
+
     async def list(self, prefix: str | None = None) -> _types.KeepListResponse:
         """LIST — List secret paths, optionally filtered by prefix. Excludes deleted secrets."""
         args: list[str] = ["LIST"]

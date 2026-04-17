@@ -79,6 +79,7 @@ print(result.version)
 | `encrypt` | `keyring, plaintext, **kwargs` | `{ status, ciphertext, key_version }` | Encrypt plaintext with the active key version |
 | `generate_data_key` | `keyring, **kwargs` | `{ status, plaintext_key, wrapped_key, key_version }` | Generate a data encryption key (envelope encryption pattern) |
 | `health` | `` | `{ status }` | Check server health |
+| `hello` | `` | `{ engine, version, protocol, commands, capabilities }` | Engine identity handshake — returns engine name, version, wire protocol, supported commands, and capability tags. Pre-auth; clients issue this on connect to verify they are talking to the expected engine and version. |
 | `key_info` | `keyring` | `{ keyring, algorithm, active_version, versions }` | Get keyring metadata and key version information |
 | `keyring_create` | `name, algorithm, **kwargs` | `{ status, keyring, algorithm, active_version }` | Create a new keyring with its first active key |
 | `keyring_list` | `` | `{ keyrings }` | List all keyring names |
@@ -115,6 +116,7 @@ print(result.status)
 | `envelope_update` | `schema, id, json` | `{ entity_id, fields, status, updated_at }` | Update non-credential fields on an existing envelope |
 | `envelope_verify` | `schema, id, field, value` | `{ status, valid }` | Verify a credential field on an envelope by explicit field name |
 | `health` | `` | `{ status }` | Health check |
+| `hello` | `` | `{ capabilities, commands, engine, protocol, version }` | Engine identity handshake — returns engine name, version, wire protocol, supported commands, and capability tags. Pre-auth; clients issue this on connect to verify they are talking to the expected engine and version. |
 | `jwks` | `schema` | `{}` | Get the JSON Web Key Set for external token verification |
 | `password_change` | `schema, id, old, new` | `{ status }` | Sugar: change password. Infers credential field from schema. Equivalent to CREDENTIAL CHANGE with implicit field. |
 | `password_import` | `schema, id, hash, **kwargs` | `{ algorithm, status }` | Sugar: import pre-hashed password. Infers credential field from schema. Equivalent to CREDENTIAL IMPORT with implicit field. |
@@ -157,6 +159,7 @@ print(result.status)
 | `command_list` | `` | `{ count, commands }` | List all supported commands |
 | `delete` | `index, id` | `{ status, id }` | Remove an entry's blind tokens from the index |
 | `health` | `` | `{ status }` | Health check |
+| `hello` | `` | `{ engine, version, protocol, commands, capabilities }` | Engine identity handshake — returns engine name, version, wire protocol, supported commands, and capability tags. Pre-auth; clients issue this on connect to verify they are talking to the expected engine and version. |
 | `index_create` | `name` | `{ status, index, created_at, tokenizer_version }` | Create a new blind index with a fresh HMAC key |
 | `index_destroy` | `name` | `{ status, index, deleted_entries }` | Crypto-shred an index: zeroize the HMAC key, delete all entries, and remove the index. After destruction, the index name can be reused. |
 | `index_info` | `name` | `{ index, created_at, entry_count, tokenizer_version }` | Get information about a blind index |
@@ -188,6 +191,7 @@ print(result.status)
 | `command_list` | `` | `{ commands, status }` | List all supported commands |
 | `evaluate` | `json` | `{ cache_until, decision, matched_policy, status, token }` | Evaluate an authorization request against policies and return a signed decision |
 | `health` | `` | `{ policy_count, status }` | Server health check |
+| `hello` | `` | `{ capabilities, commands, engine, protocol, version }` | Engine identity handshake — returns engine name, version, wire protocol, supported commands, and capability tags. Pre-auth; clients issue this on connect to verify they are talking to the expected engine and version. |
 | `jwks` | `` | `{ keys }` | Get the JSON Web Key Set for verifying decision tokens |
 | `key_info` | `` | `{ active_kid, active_version, algorithm, decision_ttl_secs, drain_days, jwks_keys, rotation_days, status, total_versions }` | Get signing key metadata |
 | `key_rotate` | `**kwargs` | `{ key_version, previous_version, rotated, status }` | Rotate the signing key |
@@ -224,6 +228,7 @@ print(result.status)
 | `config_get` | `key` | `{ key, status, value }` | Get a runtime configuration value |
 | `config_set` | `key, value` | `{ key, status, value }` | Set a runtime configuration value (only scheduler_interval_secs is mutable) |
 | `health` | `` | `{ status }` | Health check |
+| `hello` | `` | `{ capabilities, commands, engine, protocol, version }` | Engine identity handshake — returns engine name, version, wire protocol, supported commands, and capability tags. Pre-auth; clients issue this on connect to verify they are talking to the expected engine and version. |
 | `inspect` | `ca, serial` | `{ certificate_pem, serial, state, subject }` | Get certificate details |
 | `issue` | `ca, subject, profile, **kwargs` | `{ certificate_pem, private_key_pem, serial }` | Issue a new certificate. Returns cert + private key (private key never stored). |
 | `issue_from_csr` | `ca, csr_pem, profile, **kwargs` | `{ certificate_pem, serial }` | Issue a certificate from a PEM-encoded CSR |
@@ -253,6 +258,7 @@ print(result.algorithm)
 | `delete` | `path` | `{ status, path, deleted_at }` | Soft-delete a secret. Version history is preserved. |
 | `get` | `path, **kwargs` | `{ status, path, version, value, created_at, created_by }` | Retrieve a secret value. Returns the latest version by default. |
 | `health` | `` | `{ status }` | Health check. |
+| `hello` | `` | `{ engine, version, protocol, commands, capabilities }` | Engine identity handshake — returns engine name, version, wire protocol, supported commands, and capability tags. Pre-auth; clients issue this on connect to verify they are talking to the expected engine and version. |
 | `list` | `prefix=None` | `{ status, count, paths }` | List secret paths, optionally filtered by prefix. Excludes deleted secrets. |
 | `ping` | `` | `{}` | Ping-pong. |
 | `purge` | `path` | `{ status, path, purged_at }` | Permanently remove a secret and all its versions. Irreversible — used for GDPR right-to-erasure compliance. After purge, GET returns not-found (not deleted). |
@@ -286,6 +292,7 @@ print(result.status)
 | `delivery_get` | `id` | `{ channel, delivered_at, delivery_id, error, status }` | Get a delivery receipt by ID |
 | `delivery_list` | `**kwargs` | `{ count, receipts, status }` | List delivery receipts, optionally filtered by channel |
 | `health` | `` | `{ channels, status }` | Server health check |
+| `hello` | `` | `{ capabilities, commands, engine, protocol, version }` | Engine identity handshake — returns engine name, version, wire protocol, supported commands, and capability tags. Pre-auth; clients issue this on connect to verify they are talking to the expected engine and version. |
 | `metrics` | `` | `{ delivered, failed, per_channel, total_deliveries }` | Get delivery metrics (total, success, failure counts, per-channel breakdown) |
 | `notify_event` | `channel, subject, body` | `{ channel, delivered_at, delivery_id, status }` | Trigger a notification on a pre-configured channel (e.g. rotation/expiry alerts) |
 | `ping` | `` | `{}` | Connectivity check |
@@ -311,6 +318,7 @@ print(result.channel_type)
 | `count` | `**kwargs` | `{ count, scanned, status }` | Count events matching filter predicates |
 | `errors` | `**kwargs` | `{ errors, status }` | Operations ranked by error rate in the given time window |
 | `health` | `` | `{ events, status }` | Health check |
+| `hello` | `` | `{ capabilities, commands, engine, protocol, version }` | Engine identity handshake — returns engine name, version, wire protocol, supported commands, and capability tags. Pre-auth; clients issue this on connect to verify they are talking to the expected engine and version. |
 | `hotspots` | `**kwargs` | `{ hotspots, status }` | Top 20 resources by access count in the given time window |
 | `ingest` | `event_json` | `{ status }` | Ingest a single structured audit event |
 | `ingest_batch` | `events_json` | `{ ingested, status }` | Ingest multiple events in a single call |
@@ -335,6 +343,7 @@ print(result.ingested)
 | `command` | `` | `{}` | List supported commands |
 | `fingerprint` | `id, viewer_id, **kwargs` | `{ created_at, s3_key, status, viewer_id }` | Create a viewer-specific encrypted copy of a blob for leak tracing |
 | `health` | `` | `{}` | Health check |
+| `hello` | `` | `{ capabilities, commands, engine, protocol, version }` | Engine identity handshake — returns engine name, version, wire protocol, supported commands, and capability tags. Pre-auth; clients issue this on connect to verify they are talking to the expected engine and version. |
 | `inspect` | `id` | `{ blob_status, client_encrypted, content_type, created_at, encrypted_size, id, key_version, keyring, plaintext_size, status, updated_at, viewer_count }` | Read blob metadata without downloading or decrypting |
 | `list` | `**kwargs` | `{ blobs, count, status, tenant }` | List blobs for the current tenant |
 | `ping` | `` | `{}` | Ping-pong |

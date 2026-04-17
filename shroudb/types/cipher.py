@@ -63,6 +63,21 @@ class CipherHealthResponse:
     status: str
 
 @dataclass(frozen=True)
+class CipherHelloResponse:
+    """Response from ``cipher.hello()``."""
+
+    # Canonical engine name (e.g., "cipher")
+    engine: str
+    # Engine's semantic version
+    version: str
+    # Wire protocol identifier (e.g., "RESP3/1")
+    protocol: str
+    # Supported command surface (uppercase, subcommands space-separated)
+    commands: list[Any]
+    # Cross-cutting capability tags; may be empty
+    capabilities: list[Any]
+
+@dataclass(frozen=True)
 class CipherKeyInfoResponse:
     """Response from ``cipher.key_info()``."""
 

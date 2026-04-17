@@ -48,6 +48,16 @@ class ChronicleHealthResponse:
     status: str
 
 @dataclass(frozen=True)
+class ChronicleHelloResponse:
+    """Response from ``chronicle.HELLO()``."""
+
+    capabilities: list[Any]
+    commands: list[Any]
+    engine: str
+    protocol: str
+    version: str
+
+@dataclass(frozen=True)
 class ChronicleHotspotsResponse:
     """Response from ``chronicle.HOTSPOTS()``."""
 

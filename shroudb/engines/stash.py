@@ -52,6 +52,18 @@ class StashNamespace:
         result = await self._transport.execute(self._engine, args)
         return result
 
+    async def hello(self) -> _types.StashHelloResponse:
+        """HELLO — Engine identity handshake — returns engine name, version, wire protocol, supported commands, and capability tags. Pre-auth; clients issue this on connect to verify they are talking to the expected engine and version."""
+        args: list[str] = ["HELLO"]
+        result = await self._transport.execute(self._engine, args)
+        return _types.StashHelloResponse(
+            capabilities=result.get("capabilities", None),
+            commands=result.get("commands", None),
+            engine=result.get("engine", ""),
+            protocol=result.get("protocol", ""),
+            version=result.get("version", ""),
+        )
+
     async def inspect(self, id_: str) -> _types.StashInspectResponse:
         """INSPECT — Read blob metadata without downloading or decrypting"""
         args: list[str] = ["INSPECT"]

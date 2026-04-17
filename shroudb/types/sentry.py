@@ -37,6 +37,16 @@ class SentryHealthResponse:
     status: str
 
 @dataclass(frozen=True)
+class SentryHelloResponse:
+    """Response from ``sentry.HELLO()``."""
+
+    capabilities: list[Any]
+    commands: list[Any]
+    engine: str
+    protocol: str
+    version: str
+
+@dataclass(frozen=True)
 class SentryJwksResponse:
     """Response from ``sentry.JWKS()``."""
 

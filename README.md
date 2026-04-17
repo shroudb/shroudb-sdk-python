@@ -140,6 +140,7 @@ Encryption-as-a-service
 | `encrypt(keyring, plaintext, **kwargs)` | Encrypt plaintext with the active key version |
 | `generate_data_key(keyring, **kwargs)` | Generate a data encryption key (envelope encryption pattern) |
 | `health()` | Check server health |
+| `hello()` | Engine identity handshake — returns engine name, version, wire protocol, supported commands, and capability tags. Pre-auth; clients issue this on connect to verify they are talking to the expected engine and version. |
 | `key_info(keyring)` | Get keyring metadata and key version information |
 | `keyring_create(name, algorithm, **kwargs)` | Create a new keyring with its first active key |
 | `keyring_list()` | List all keyring names |
@@ -167,6 +168,7 @@ Schema-driven credential envelope engine
 | `envelope_update(schema, id, json)` | Update non-credential fields on an existing envelope |
 | `envelope_verify(schema, id, field, value)` | Verify a credential field on an envelope by explicit field name |
 | `health()` | Health check |
+| `hello()` | Engine identity handshake — returns engine name, version, wire protocol, supported commands, and capability tags. Pre-auth; clients issue this on connect to verify they are talking to the expected engine and version. |
 | `jwks(schema)` | Get the JSON Web Key Set for external token verification |
 | `password_change(schema, id, old, new)` | Sugar: change password. Infers credential field from schema. Equivalent to CREDENTIAL CHANGE with implicit field. |
 | `password_import(schema, id, hash, **kwargs)` | Sugar: import pre-hashed password. Infers credential field from schema. Equivalent to CREDENTIAL IMPORT with implicit field. |
@@ -200,6 +202,7 @@ Searchable encryption with blind indexing
 | `command_list()` | List all supported commands |
 | `delete(index, id)` | Remove an entry's blind tokens from the index |
 | `health()` | Health check |
+| `hello()` | Engine identity handshake — returns engine name, version, wire protocol, supported commands, and capability tags. Pre-auth; clients issue this on connect to verify they are talking to the expected engine and version. |
 | `index_create(name)` | Create a new blind index with a fresh HMAC key |
 | `index_destroy(name)` | Crypto-shred an index: zeroize the HMAC key, delete all entries, and remove the index. After destruction, the index name can be reused. |
 | `index_info(name)` | Get information about a blind index |
@@ -222,6 +225,7 @@ Policy-based authorization engine
 | `command_list()` | List all supported commands |
 | `evaluate(json)` | Evaluate an authorization request against policies and return a signed decision |
 | `health()` | Server health check |
+| `hello()` | Engine identity handshake — returns engine name, version, wire protocol, supported commands, and capability tags. Pre-auth; clients issue this on connect to verify they are talking to the expected engine and version. |
 | `jwks()` | Get the JSON Web Key Set for verifying decision tokens |
 | `key_info()` | Get signing key metadata |
 | `key_rotate(**kwargs)` | Rotate the signing key |
@@ -249,6 +253,7 @@ Internal certificate authority engine
 | `config_get(key)` | Get a runtime configuration value |
 | `config_set(key, value)` | Set a runtime configuration value (only scheduler_interval_secs is mutable) |
 | `health()` | Health check |
+| `hello()` | Engine identity handshake — returns engine name, version, wire protocol, supported commands, and capability tags. Pre-auth; clients issue this on connect to verify they are talking to the expected engine and version. |
 | `inspect(ca, serial)` | Get certificate details |
 | `issue(ca, subject, profile, **kwargs)` | Issue a new certificate. Returns cert + private key (private key never stored). |
 | `issue_from_csr(ca, csr_pem, profile, **kwargs)` | Issue a certificate from a PEM-encoded CSR |
@@ -269,6 +274,7 @@ Secrets manager with path-based access control and versioning
 | `delete(path)` | Soft-delete a secret. Version history is preserved. |
 | `get(path, **kwargs)` | Retrieve a secret value. Returns the latest version by default. |
 | `health()` | Health check. |
+| `hello()` | Engine identity handshake — returns engine name, version, wire protocol, supported commands, and capability tags. Pre-auth; clients issue this on connect to verify they are talking to the expected engine and version. |
 | `list(prefix)` | List secret paths, optionally filtered by prefix. Excludes deleted secrets. |
 | `ping()` | Ping-pong. |
 | `purge(path)` | Permanently remove a secret and all its versions. Irreversible — used for GDPR right-to-erasure compliance. After purge, GET returns not-found (not deleted). |
@@ -293,6 +299,7 @@ Just-in-time decryption delivery engine
 | `delivery_get(id)` | Get a delivery receipt by ID |
 | `delivery_list(**kwargs)` | List delivery receipts, optionally filtered by channel |
 | `health()` | Server health check |
+| `hello()` | Engine identity handshake — returns engine name, version, wire protocol, supported commands, and capability tags. Pre-auth; clients issue this on connect to verify they are talking to the expected engine and version. |
 | `metrics()` | Get delivery metrics (total, success, failure counts, per-channel breakdown) |
 | `notify_event(channel, subject, body)` | Trigger a notification on a pre-configured channel (e.g. rotation/expiry alerts) |
 | `ping()` | Connectivity check |
@@ -309,6 +316,7 @@ Structured audit event engine
 | `count(**kwargs)` | Count events matching filter predicates |
 | `errors(**kwargs)` | Operations ranked by error rate in the given time window |
 | `health()` | Health check |
+| `hello()` | Engine identity handshake — returns engine name, version, wire protocol, supported commands, and capability tags. Pre-auth; clients issue this on connect to verify they are talking to the expected engine and version. |
 | `hotspots(**kwargs)` | Top 20 resources by access count in the given time window |
 | `ingest(event_json)` | Ingest a single structured audit event |
 | `ingest_batch(events_json)` | Ingest multiple events in a single call |
@@ -326,6 +334,7 @@ Encrypted blob storage with S3 backend and envelope encryption
 | `command()` | List supported commands |
 | `fingerprint(id, viewer_id, **kwargs)` | Create a viewer-specific encrypted copy of a blob for leak tracing |
 | `health()` | Health check |
+| `hello()` | Engine identity handshake — returns engine name, version, wire protocol, supported commands, and capability tags. Pre-auth; clients issue this on connect to verify they are talking to the expected engine and version. |
 | `inspect(id)` | Read blob metadata without downloading or decrypting |
 | `list(**kwargs)` | List blobs for the current tenant |
 | `ping()` | Ping-pong |

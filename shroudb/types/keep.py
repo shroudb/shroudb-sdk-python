@@ -45,6 +45,21 @@ class KeepHealthResponse:
     status: str
 
 @dataclass(frozen=True)
+class KeepHelloResponse:
+    """Response from ``keep.hello()``."""
+
+    # Canonical engine name (e.g., "keep")
+    engine: str
+    # Engine's semantic version
+    version: str
+    # Wire protocol identifier (e.g., "RESP3/1")
+    protocol: str
+    # Supported command surface (uppercase, subcommands space-separated)
+    commands: list[Any]
+    # Cross-cutting capability tags; may be empty
+    capabilities: list[Any]
+
+@dataclass(frozen=True)
 class KeepListResponse:
     """Response from ``keep.list()``."""
 

@@ -79,6 +79,16 @@ class ForgeHealthResponse:
     status: str
 
 @dataclass(frozen=True)
+class ForgeHelloResponse:
+    """Response from ``forge.HELLO()``."""
+
+    capabilities: list[Any]
+    commands: list[Any]
+    engine: str
+    protocol: str
+    version: str
+
+@dataclass(frozen=True)
 class ForgeInspectResponse:
     """Response from ``forge.INSPECT()``."""
 

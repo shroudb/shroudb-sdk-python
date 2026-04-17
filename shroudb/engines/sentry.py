@@ -49,6 +49,18 @@ class SentryNamespace:
         result = await self._transport.execute(self._engine, args)
         return _types.SentryHealthResponse(policy_count=result.get("policy_count", 0), status=result.get("status", ""))
 
+    async def hello(self) -> _types.SentryHelloResponse:
+        """HELLO — Engine identity handshake — returns engine name, version, wire protocol, supported commands, and capability tags. Pre-auth; clients issue this on connect to verify they are talking to the expected engine and version."""
+        args: list[str] = ["HELLO"]
+        result = await self._transport.execute(self._engine, args)
+        return _types.SentryHelloResponse(
+            capabilities=result.get("capabilities", None),
+            commands=result.get("commands", None),
+            engine=result.get("engine", ""),
+            protocol=result.get("protocol", ""),
+            version=result.get("version", ""),
+        )
+
     async def jwks(self) -> _types.SentryJwksResponse:
         """JWKS — Get the JSON Web Key Set for verifying decision tokens"""
         args: list[str] = ["JWKS"]
