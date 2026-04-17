@@ -41,6 +41,8 @@ await db.close()
 | `config_get` | `key` | `{ key, source, value }` | Read a runtime configuration value |
 | `config_set` | `key, value` | `{}` | Set a runtime configuration value (admin only). Only registered config keys are accepted; unknown keys return an error. Values are type-checked against the key's schema (u64, bool, string). Valid keys: max_segment_bytes, max_segment_entries, snapshot_entry_threshold, snapshot_time_threshold_secs. |
 | `delete` | `namespace, key` | `{ version }` | Delete a key by writing a tombstone |
+| `delif` | `namespace, key, **kwargs` | `{ version }` | Compare-and-swap DELETE. Writes a tombstone only if the key's current active version equals EXPECT. On mismatch returns VERSIONCONFLICT. Missing or tombstoned keys return NOTFOUND regardless of EXPECT. |
+| `delprefix` | `namespace, prefix` | `{ deleted }` | Tombstone every active key in the namespace whose byte representation starts with the given prefix. Held under the per-namespace write lock. Empty prefix is rejected — use NAMESPACE DROP for full teardown. Over the per-call cap, returns PREFIXTOOLARGE with no partial deletion. |
 | `get` | `namespace, key, meta=None, **kwargs` | `{ key, metadata, value, version }` | Retrieve the value at a key |
 | `health` | `` | `{ message }` | Check server health |
 | `list` | `namespace, **kwargs` | `{ cursor, keys }` | List active keys in a namespace. Returns an error if the CURSOR value does not correspond to a key that exists in the namespace. |
@@ -53,6 +55,7 @@ await db.close()
 | `ping` | `` | `{ message }` | Test connectivity |
 | `pipeline` | `count` | `{}` | Execute commands atomically (all succeed or all roll back) |
 | `put` | `namespace, key, value=None, **kwargs` | `{ version }` | Store a value at the given key. Auto-increments version. |
+| `putif` | `namespace, key, value, **kwargs` | `{ version }` | Compare-and-swap PUT. Writes only if the key's current active version equals EXPECT. On mismatch returns VERSIONCONFLICT carrying the actual current version. EXPECT 0 means "key must not exist or must be tombstoned". |
 | `rekey` | `` | `{ message }` | Begin online rekey (zero-downtime master key rotation) |
 | `rekey_status` | `` | `{ in_progress, progress, segments_completed, started_at, total_segments }` | Query progress of an in-flight rekey operation |
 | `subscribe` | `namespace, **kwargs` | `{}` | Subscribe to change events on a namespace |
@@ -390,7 +393,9 @@ except ShrouDBError as err:
 | `NOT_FOUND` | Key or resource does not exist |
 | `NOT_READY` | Server is not in READY state |
 | `PIPELINE_ABORTED` | Pipeline command failed, all commands rolled back |
+| `PREFIX_TOO_LARGE` | A DELPREFIX call matched more keys than the configured per-call cap. No keys were deleted. Caller should refine the prefix and retry. Wire format: `PREFIXTOOLARGE matched=<n> limit=<m>`. |
 | `VALIDATION_FAILED` | Metadata validation failed against namespace schema |
+| `VERSION_CONFLICT` | Compare-and-swap precondition failed. The error carries the actual current version so clients can retry without re-reading. Wire format: `VERSIONCONFLICT current=<n>`. |
 | `VERSION_NOT_FOUND` | Requested version does not exist |
 | `BADARG` | Missing or invalid argument |
 | `DISABLED` | Keyring is disabled |

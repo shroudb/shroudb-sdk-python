@@ -110,6 +110,8 @@ Encrypted key-value database
 | `config_get(key)` | Read a runtime configuration value |
 | `config_set(key, value)` | Set a runtime configuration value (admin only). Only registered config keys are accepted; unknown keys return an error. Values are type-checked against the key's schema (u64, bool, string). Valid keys: max_segment_bytes, max_segment_entries, snapshot_entry_threshold, snapshot_time_threshold_secs. |
 | `delete(namespace, key)` | Delete a key by writing a tombstone |
+| `delif(namespace, key, **kwargs)` | Compare-and-swap DELETE. Writes a tombstone only if the key's current active version equals EXPECT. On mismatch returns VERSIONCONFLICT. Missing or tombstoned keys return NOTFOUND regardless of EXPECT. |
+| `delprefix(namespace, prefix)` | Tombstone every active key in the namespace whose byte representation starts with the given prefix. Held under the per-namespace write lock. Empty prefix is rejected — use NAMESPACE DROP for full teardown. Over the per-call cap, returns PREFIXTOOLARGE with no partial deletion. |
 | `get(namespace, key, meta, **kwargs)` | Retrieve the value at a key |
 | `health()` | Check server health |
 | `list(namespace, **kwargs)` | List active keys in a namespace. Returns an error if the CURSOR value does not correspond to a key that exists in the namespace. |
@@ -122,6 +124,7 @@ Encrypted key-value database
 | `ping()` | Test connectivity |
 | `pipeline(commands, request_id=None)` | Execute commands atomically (all succeed or all roll back) |
 | `put(namespace, key, value, **kwargs)` | Store a value at the given key. Auto-increments version. |
+| `putif(namespace, key, value, **kwargs)` | Compare-and-swap PUT. Writes only if the key's current active version equals EXPECT. On mismatch returns VERSIONCONFLICT carrying the actual current version. EXPECT 0 means "key must not exist or must be tombstoned". |
 | `rekey()` | Begin online rekey (zero-downtime master key rotation) |
 | `rekey_status()` | Query progress of an in-flight rekey operation |
 | `subscribe(namespace, **kwargs)` | Subscribe to change events on a namespace |

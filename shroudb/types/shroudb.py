@@ -34,6 +34,18 @@ class ShroudbDeleteResponse:
     version: int
 
 @dataclass(frozen=True)
+class ShroudbDelifResponse:
+    """Response from ``shroudb.DELIF()``."""
+
+    version: int
+
+@dataclass(frozen=True)
+class ShroudbDelprefixResponse:
+    """Response from ``shroudb.DELPREFIX()``."""
+
+    deleted: int
+
+@dataclass(frozen=True)
 class ShroudbGetResponse:
     """Response from ``shroudb.GET()``."""
 
@@ -86,6 +98,12 @@ class ShroudbPingResponse:
 @dataclass(frozen=True)
 class ShroudbPutResponse:
     """Response from ``shroudb.PUT()``."""
+
+    version: int
+
+@dataclass(frozen=True)
+class ShroudbPutifResponse:
+    """Response from ``shroudb.PUTIF()``."""
 
     version: int
 

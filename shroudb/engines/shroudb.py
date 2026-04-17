@@ -57,6 +57,25 @@ class ShroudbNamespace:
         result = await self._transport.execute(self._engine, args)
         return _types.ShroudbDeleteResponse(version=result.get("version", 0))
 
+    async def delif(self, namespace: str, key: str, expect: int | None = None) -> _types.ShroudbDelifResponse:
+        """DELIF — Compare-and-swap DELETE. Writes a tombstone only if the key's current active version equals EXPECT. On mismatch returns VERSIONCONFLICT. Missing or tombstoned keys return NOTFOUND regardless of EXPECT."""
+        args: list[str] = ["DELIF"]
+        args.append(str(namespace))
+        args.append(str(key))
+        if expect is not None:
+            args.append("EXPECT")
+            args.append(str(expect))
+        result = await self._transport.execute(self._engine, args)
+        return _types.ShroudbDelifResponse(version=result.get("version", 0))
+
+    async def delprefix(self, namespace: str, prefix: str) -> _types.ShroudbDelprefixResponse:
+        """DELPREFIX — Tombstone every active key in the namespace whose byte representation starts with the given prefix. Held under the per-namespace write lock. Empty prefix is rejected — use NAMESPACE DROP for full teardown. Over the per-call cap, returns PREFIXTOOLARGE with no partial deletion."""
+        args: list[str] = ["DELPREFIX"]
+        args.append(str(namespace))
+        args.append(str(prefix))
+        result = await self._transport.execute(self._engine, args)
+        return _types.ShroudbDelprefixResponse(deleted=result.get("deleted", 0))
+
     async def get(self, namespace: str, key: str, meta: bool | None = None, version: int | None = None) -> _types.ShroudbGetResponse:
         """GET — Retrieve the value at a key"""
         args: list[str] = ["GET"]
@@ -182,7 +201,7 @@ class ShroudbNamespace:
         """PIPELINE — Execute commands atomically (all succeed or all roll back)"""
         return await self._transport.execute_pipeline(self._engine, commands, request_id)
 
-    async def put(self, namespace: str, key: str, value: str | None = None, meta: dict[str, Any] | None = None) -> _types.ShroudbPutResponse:
+    async def put(self, namespace: str, key: str, value: str | None = None, meta: dict[str, Any] | None = None, ttl: int | None = None) -> _types.ShroudbPutResponse:
         """PUT — Store a value at the given key. Auto-increments version."""
         args: list[str] = ["PUT"]
         args.append(str(namespace))
@@ -192,8 +211,26 @@ class ShroudbNamespace:
         if meta is not None:
             args.append("META")
             args.append(meta if isinstance(meta, str) else json.dumps(meta))
+        if ttl is not None:
+            args.append("TTL")
+            args.append(str(ttl))
         result = await self._transport.execute(self._engine, args)
         return _types.ShroudbPutResponse(version=result.get("version", 0))
+
+    async def putif(self, namespace: str, key: str, value: str, expect: int | None = None, meta: dict[str, Any] | None = None) -> _types.ShroudbPutifResponse:
+        """PUTIF — Compare-and-swap PUT. Writes only if the key's current active version equals EXPECT. On mismatch returns VERSIONCONFLICT carrying the actual current version. EXPECT 0 means "key must not exist or must be tombstoned"."""
+        args: list[str] = ["PUTIF"]
+        args.append(str(namespace))
+        args.append(str(key))
+        args.append(str(value))
+        if expect is not None:
+            args.append("EXPECT")
+            args.append(str(expect))
+        if meta is not None:
+            args.append("META")
+            args.append(meta if isinstance(meta, str) else json.dumps(meta))
+        result = await self._transport.execute(self._engine, args)
+        return _types.ShroudbPutifResponse(version=result.get("version", 0))
 
     async def rekey(self) -> _types.ShroudbRekeyResponse:
         """REKEY — Begin online rekey (zero-downtime master key rotation)"""

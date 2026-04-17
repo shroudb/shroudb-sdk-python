@@ -128,6 +128,9 @@ class ErrorCode:
     POLICY: str = "POLICY"
     """Operation denied by keyring policy"""
 
+    PREFIX_TOO_LARGE: str = "PREFIX_TOO_LARGE"
+    """A DELPREFIX call matched more keys than the configured per-call cap. No keys were deleted. Caller should refine the prefix and retry. Wire format: `PREFIXTOOLARGE matched=<n> limit=<m>`."""
+
     RETIRED: str = "RETIRED"
     """Key version is retired — use REWRAP"""
 
@@ -163,6 +166,9 @@ class ErrorCode:
 
     VERIFICATION_FAILED: str = "VERIFICATION_FAILED"
     """Credential verification failed (wrong password)"""
+
+    VERSION_CONFLICT: str = "VERSION_CONFLICT"
+    """Compare-and-swap precondition failed. The error carries the actual current version so clients can retry without re-reading. Wire format: `VERSIONCONFLICT current=<n>`."""
 
     VERSION_NOTFOUND: str = "VERSION_NOTFOUND"
     """Requested version does not exist"""
