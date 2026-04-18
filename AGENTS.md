@@ -366,6 +366,40 @@ print(result.blob_status)
 await db.stash.retrieve("alice")
 ```
 
+## `db.scroll` — Durable append-only event log with cursored readers and reader groups
+
+| Method | Args | Returns | Description |
+|--------|------|---------|-------------|
+| `ack` | `log, group, offset` | `{ status }` | Acknowledge a pending entry. Idempotent. |
+| `append` | `log, payload_b64, **kwargs` | `{ offset, status }` | Append an entry to a log. Mints a monotonic offset through the per-log serializer and encrypts the entry with the per-log DEK. |
+| `auth` | `token` | `{ status }` | Authenticate the connection. Consumed at the connection layer before dispatch. |
+| `claim` | `log, group, reader_id, min_idle_ms` | `{ claimed, status }` | Reassign stalled pending entries to a new reader. Entries whose delivery_count would cross max_delivery_count are moved to scroll.dlq instead. |
+| `command_list` | `` | `{ commands }` | List all supported commands with their syntax. |
+| `create_group` | `log, group, start_offset` | `{ status }` | Create a reader group. start_offset = 'earliest' | '0' starts from offset 0; 'latest' | '-1' starts after the current tail. |
+| `delete_group` | `log, group` | `{ status }` | Tear down a single reader group: delete every pending record, then remove the group row. Counterpart to CREATE_GROUP; doesn't touch scroll.logs or the DEK, so other groups on the same log keep operating. Returns 'group not found' when the target doesn't exist. |
+| `delete_log` | `log` | `{ status }` | Hard-delete all log state (entries, groups, pending, offset counter) and destroy the wrapped DEK to crypto-shred. |
+| `group_info` | `log, group` | `{ created_at_ms, group, last_delivered_offset, log, members, pending_count }` | Stats for a reader group: cursor, members, and pending entry count. |
+| `health` | `` | `{ status }` | Engine liveness probe. |
+| `hello` | `` | `{ capabilities, commands, engine, protocol, version }` | Engine identity + version + supported commands. Pre-auth version-detection handshake. |
+| `log_info` | `log` | `{ created_at_ms, entries_minted, groups, latest_offset, log }` | Stats for a log: entries minted, latest offset, created-at, and list of reader groups. |
+| `ping` | `` | `{}` | Connection liveness probe. Returns PONG. |
+| `read` | `log, from_offset, limit` | `{ entries, status }` | Range read starting at from_offset. Missing offsets (trimmed / TTL-expired) are skipped silently. |
+| `read_group` | `log, group, reader_id, limit` | `{ entries, status }` | Advance the group cursor under CAS on `scroll.groups`, register PendingEntry records, and return the decrypted batch. |
+| `replay` | `log, group, offset` | `{ status }` | Move a DLQ entry back into a group's pending set. Preserves the original reader_id from the DLQ record, resets delivery_count to 1, stamps a fresh delivered_at_ms. Put-pending-first / delete-dlq-second ordering: a crash in-between leaves a duplicate, never a loss. Returns 'dlq entry not found' when the offset has no DLQ record, 'group not found' when the target group doesn't exist. |
+| `tail` | `log, from_offset, limit, **kwargs` | `{ entries, status }` | Live tail: returns at most limit entries at or after from_offset, waiting up to TIMEOUT ms (default 30_000) for new appends. Closes with TAIL_OVERFLOW on subscribe backpressure; client should fall back to READ. |
+| `trim` | `log, selector, value` | `{ deleted, status }` | Explicit retention. MAX_LEN keeps the most recent N offsets; MAX_AGE drops entries whose appended_at_ms is older than now-ms. |
+
+### Examples
+
+```python
+result = await db.scroll.ack("log", "group", 1)
+print(result.status)
+result = await db.scroll.append("log", "payload_b64")
+print(result.offset)
+result = await db.scroll.claim("log", "group", "reader_id", 1)
+print(result.claimed)
+```
+
 ## Error Handling
 
 All methods raise ``ShrouDBError`` on failure. The ``code`` attribute matches the server error code (e.g., ``NOTFOUND``, ``DENIED``, ``BADARG``).
@@ -436,6 +470,8 @@ except ShrouDBError as err:
 | `REVOKED` | Blob has been soft-revoked |
 | `SHREDDED` | Blob has been crypto-shredded (unrecoverable) |
 | `STORE` | ShrouDB Store (metadata) operation failed |
+| `CAPABILITY` | Required engine capability is not configured (e.g. Cipher) |
+| `CONFLICT` | Reader group already exists, or CAS retry budget exhausted on group cursor advancement |
 
 ## Common Mistakes
 

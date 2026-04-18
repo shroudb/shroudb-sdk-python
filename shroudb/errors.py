@@ -38,6 +38,9 @@ class ErrorCode:
     BAD_ARG: str = "BAD_ARG"
     """Missing or malformed command argument"""
 
+    CAPABILITY: str = "CAPABILITY"
+    """Required engine capability is not configured (e.g. Cipher)"""
+
     CAPABILITY_MISSING: str = "CAPABILITY_MISSING"
     """Required engine capability not available (e.g., Cipher for PII fields)"""
 
@@ -46,6 +49,9 @@ class ErrorCode:
 
     CLIENT_ENCRYPTED: str = "CLIENT_ENCRYPTED"
     """Cannot fingerprint a client-encrypted blob (client manages encryption)"""
+
+    CONFLICT: str = "CONFLICT"
+    """Reader group already exists, or CAS retry budget exhausted on group cursor advancement"""
 
     CRYPTO: str = "CRYPTO"
     """Encryption or decryption failed"""

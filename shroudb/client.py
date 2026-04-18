@@ -17,6 +17,7 @@ from .engines.keep import KeepNamespace
 from .engines.courier import CourierNamespace
 from .engines.chronicle import ChronicleNamespace
 from .engines.stash import StashNamespace
+from .engines.scroll import ScrollNamespace
 
 
 class _NoTransport(Transport):
@@ -81,6 +82,7 @@ class ShrouDB:
         courier: str | None = None,
         chronicle: str | None = None,
         stash: str | None = None,
+        scroll: str | None = None,
     ) -> None:
         self._transports: list[Transport] = []
 
@@ -98,6 +100,7 @@ class ShrouDB:
                     "courier": "/v1/courier",
                     "chronicle": "/v1/chronicle",
                     "stash": "/v1/stash",
+                    "scroll": "/v1/scroll",
                 }
                 default_transport = HttpTransport(moat, token, prefixes)
             else:
@@ -193,6 +196,15 @@ class ShrouDB:
             self.stash = StashNamespace(default_transport, "stash")
         else:
             self.stash = StashNamespace(_NoTransport("stash"), "stash")
+
+        if scroll is not None:
+            _t_scroll = Resp3Transport(scroll)
+            self._transports.append(_t_scroll)
+            self.scroll: ScrollNamespace = ScrollNamespace(_t_scroll, "scroll")
+        elif default_transport is not None:
+            self.scroll = ScrollNamespace(default_transport, "scroll")
+        else:
+            self.scroll = ScrollNamespace(_NoTransport("scroll"), "scroll")
 
     async def close(self) -> None:
         """Close all connections and release resources."""

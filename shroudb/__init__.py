@@ -14,6 +14,7 @@ from .engines.keep import KeepNamespace
 from .engines.courier import CourierNamespace
 from .engines.chronicle import ChronicleNamespace
 from .engines.stash import StashNamespace
+from .engines.scroll import ScrollNamespace
 
 __all__ = [
     "ShrouDB",
@@ -29,4 +30,5 @@ __all__ = [
     "CourierNamespace",
     "ChronicleNamespace",
     "StashNamespace",
+    "ScrollNamespace",
 ]

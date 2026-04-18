@@ -9,3 +9,4 @@ from .keep import KeepNamespace  # noqa: F401
 from .courier import CourierNamespace  # noqa: F401
 from .chronicle import ChronicleNamespace  # noqa: F401
 from .stash import StashNamespace  # noqa: F401
+from .scroll import ScrollNamespace  # noqa: F401

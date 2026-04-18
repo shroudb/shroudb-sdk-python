@@ -9,3 +9,4 @@ from .keep import *  # noqa: F401,F403
 from .courier import *  # noqa: F401,F403
 from .chronicle import *  # noqa: F401,F403
 from .stash import *  # noqa: F401,F403
+from .scroll import *  # noqa: F401,F403
