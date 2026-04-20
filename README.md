@@ -294,12 +294,12 @@ Just-in-time decryption delivery engine
 | Method | Description |
 |--------|-------------|
 | `auth(token)` | Authenticate the connection with a token |
-| `channel_create(name, type, config_json)` | Create a delivery channel |
+| `channel_create(name, type, **kwargs)` | Create a delivery channel. Config may be supplied as a JSON blob or as keyword args. |
 | `channel_delete(name)` | Delete a channel |
 | `channel_get(name)` | Get channel configuration |
 | `channel_list()` | List all channels |
 | `command_list()` | List available commands |
-| `deliver(json)` | Decrypt recipient and deliver a message |
+| `deliver(**kwargs)` | Decrypt recipient and deliver a message. Request may be a JSON DeliveryRequest or keyword args. |
 | `delivery_get(id)` | Get a delivery receipt by ID |
 | `delivery_list(**kwargs)` | List delivery receipts, optionally filtered by channel |
 | `health()` | Server health check |

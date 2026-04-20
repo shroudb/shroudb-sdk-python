@@ -24,12 +24,17 @@ class CourierNamespace:
         result = await self._transport.execute(self._engine, args)
         return _types.CourierAuthResponse(status=result.get("status", ""))
 
-    async def channel_create(self, name: str, type_: str, config_json: str) -> _types.CourierChannelCreateResponse:
-        """CHANNEL CREATE — Create a delivery channel"""
+    async def channel_create(self, name: str, type_: str, config_json: str | None = None, url: str | None = None) -> _types.CourierChannelCreateResponse:
+        """CHANNEL CREATE — Create a delivery channel. Config may be supplied as a JSON blob or as keyword args."""
         args: list[str] = ["CHANNEL", "CREATE"]
         args.append(str(name))
         args.append(str(type_))
-        args.append(str(config_json))
+        if config_json is not None:
+            args.append("CONFIG_JSON")
+            args.append(str(config_json))
+        if url is not None:
+            args.append("URL")
+            args.append(str(url))
         result = await self._transport.execute(self._engine, args)
         return _types.CourierChannelCreateResponse(
             channel_type=result.get("channel_type", ""),
@@ -72,10 +77,27 @@ class CourierNamespace:
         result = await self._transport.execute(self._engine, args)
         return _types.CourierCommandListResponse(commands=result.get("commands", None), count=result.get("count", 0))
 
-    async def deliver(self, json_data: str) -> _types.CourierDeliverResponse:
-        """DELIVER — Decrypt recipient and deliver a message"""
-        args: list[str] = ["DELIVER"]
-        args.append(str(json_data))
+    async def deliver(self, json_data: str | None = None, channel: str | None = None, recipient: str | None = None, subject: str | None = None, body: str | None = None, content_type: str | None = None) -> _types.CourierDeliverResponse:
+        """DELIVER (<json> | — Decrypt recipient and deliver a message. Request may be a JSON DeliveryRequest or keyword args."""
+        args: list[str] = ["DELIVER", "(<json> |"]
+        if json_data is not None:
+            args.append("JSON")
+            args.append(str(json_data))
+        if channel is not None:
+            args.append("CHANNEL")
+            args.append(str(channel))
+        if recipient is not None:
+            args.append("RECIPIENT")
+            args.append(str(recipient))
+        if subject is not None:
+            args.append("SUBJECT")
+            args.append(str(subject))
+        if body is not None:
+            args.append("BODY")
+            args.append(str(body))
+        if content_type is not None:
+            args.append("CONTENT_TYPE")
+            args.append(str(content_type))
         result = await self._transport.execute(self._engine, args)
         return _types.CourierDeliverResponse(
             channel=result.get("channel", ""),

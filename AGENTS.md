@@ -286,12 +286,12 @@ print(result.status)
 | Method | Args | Returns | Description |
 |--------|------|---------|-------------|
 | `auth` | `token` | `{ status }` | Authenticate the connection with a token |
-| `channel_create` | `name, type, config_json` | `{ channel_type, name, status }` | Create a delivery channel |
+| `channel_create` | `name, type, **kwargs` | `{ channel_type, name, status }` | Create a delivery channel. Config may be supplied as a JSON blob or as keyword args. |
 | `channel_delete` | `name` | `{ name, status }` | Delete a channel |
 | `channel_get` | `name` | `{ channel_type, created_at, enabled, name }` | Get channel configuration |
 | `channel_list` | `` | `{ channels, count, status }` | List all channels |
 | `command_list` | `` | `{ commands, count }` | List available commands |
-| `deliver` | `json` | `{ channel, delivered_at, delivery_id, status }` | Decrypt recipient and deliver a message |
+| `deliver` | `**kwargs` | `{ channel, delivered_at, delivery_id, status }` | Decrypt recipient and deliver a message. Request may be a JSON DeliveryRequest or keyword args. |
 | `delivery_get` | `id` | `{ channel, delivered_at, delivery_id, error, status }` | Get a delivery receipt by ID |
 | `delivery_list` | `**kwargs` | `{ count, receipts, status }` | List delivery receipts, optionally filtered by channel |
 | `health` | `` | `{ channels, status }` | Server health check |
@@ -303,7 +303,7 @@ print(result.status)
 ### Examples
 
 ```python
-result = await db.courier.channel_create("name", "type", "config_json")
+result = await db.courier.channel_create("name", "type")
 print(result.channel_type)
 result = await db.courier.channel_delete("name")
 print(result.name)
