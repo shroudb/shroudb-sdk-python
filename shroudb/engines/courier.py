@@ -30,7 +30,6 @@ class CourierNamespace:
         args.append(str(name))
         args.append(str(type_))
         if config_json is not None:
-            args.append("CONFIG_JSON")
             args.append(str(config_json))
         if url is not None:
             args.append("URL")
@@ -78,16 +77,13 @@ class CourierNamespace:
         return _types.CourierCommandListResponse(commands=result.get("commands", None), count=result.get("count", 0))
 
     async def deliver(self, json_data: str | None = None, channel: str | None = None, recipient: str | None = None, subject: str | None = None, body: str | None = None, content_type: str | None = None) -> _types.CourierDeliverResponse:
-        """DELIVER (<json> | — Decrypt recipient and deliver a message. Request may be a JSON DeliveryRequest or keyword args."""
-        args: list[str] = ["DELIVER", "(<json> |"]
+        """DELIVER — Decrypt recipient and deliver a message. Request may be a JSON DeliveryRequest or keyword args."""
+        args: list[str] = ["DELIVER"]
         if json_data is not None:
-            args.append("JSON")
             args.append(str(json_data))
         if channel is not None:
-            args.append("CHANNEL")
             args.append(str(channel))
         if recipient is not None:
-            args.append("RECIPIENT")
             args.append(str(recipient))
         if subject is not None:
             args.append("SUBJECT")

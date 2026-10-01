@@ -183,9 +183,7 @@ class ScrollNamespace:
         """TRIM — Explicit retention. MAX_LEN keeps the most recent N offsets; MAX_AGE drops entries whose appended_at_ms is older than now-ms."""
         args: list[str] = ["TRIM"]
         args.append(str(log))
-        args.append("MAX_LEN")
         args.append(str(selector))
-        args.append("TRIM")
         args.append(str(value))
         result = await self._transport.execute(self._engine, args)
         return _types.ScrollTrimResponse(deleted=result.get("deleted", 0), status=result.get("status", ""))

@@ -206,13 +206,10 @@ class SigilNamespace:
         """SCHEMA ALTER — Add or remove fields from a schema, producing a new version. Added fields are optional (required=false). Existing envelopes remain readable."""
         args: list[str] = ["SCHEMA", "ALTER"]
         args.append(str(name))
-        args.append("ADD")
         args.append(str(action))
         if field_json is not None:
-            args.append("FIELD_JSON")
             args.append(field_json if isinstance(field_json, str) else json.dumps(field_json))
         if field_name is not None:
-            args.append("FIELD_NAME")
             args.append(str(field_name))
         result = await self._transport.execute(self._engine, args)
         return _types.SigilSchemaAlterResponse(
